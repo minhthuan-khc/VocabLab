@@ -1,0 +1,20 @@
+@model List<QuizQuestion>
+
+<form id="quiz-form" asp-action="SubmitQuiz" method="post">
+@for (int i = 0; i < Model.Count; i++)
+{
+    <div class="question-card">
+        <h4>Từ: <strong>@Model[i].CorrectWord.Term</strong></h4>
+        @foreach (var option in Model[i].Options)
+        {
+            <label>
+                <input type="radio" 
+                       name="answers[@Model[i].CorrectWord.Id]" 
+                       value="@(option == Model[i].CorrectWord.Definition)" />
+                @option
+            </label>
+        }
+    </div>
+}
+    <button type="submit">Nộp bài</button>
+</form>

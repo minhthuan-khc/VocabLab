@@ -1,0 +1,12 @@
+@model IEnumerable<Word>
+
+<div class="word-grid">
+@foreach (var word in Model)
+{
+    <div class="word-card">
+        <h3>@word.Term</h3>
+        <p>@word.Definition</p>
+        <span class="badge">@word.Category</span>
+    </div>
+}
+</div>
