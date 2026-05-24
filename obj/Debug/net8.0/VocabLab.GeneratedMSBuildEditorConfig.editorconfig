@@ -1,55 +1,60 @@
 is_global = true
 build_property.TargetFramework = net8.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v8.0
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = true
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EntryPointFilePath = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = VocabLab
 build_property.RootNamespace = VocabLab
-build_property.ProjectDir = D:\HK6\ProjectOOP\VocabLab\
+build_property.ProjectDir = D:\Tải liệu\HK6\KỸ THUẬT LẬP TRÌNH NÂNG CAO\VocabLab\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\HK6\ProjectOOP\VocabLab
+build_property.MSBuildProjectDirectory = D:\Tải liệu\HK6\KỸ THUẬT LẬP TRÌNH NÂNG CAO\VocabLab
 build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/Home/Index.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/Home/Privacy.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/Shared/Error.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/Shared/_ValidationScriptsPartial.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/Word/Index.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/Word/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/Word/Quiz.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/Word/Quiz.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxRdWl6LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/_ViewImports.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/_ViewStart.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/HK6/ProjectOOP/VocabLab/Views/Shared/_Layout.cshtml]
+[D:/Tải liệu/HK6/KỸ THUẬT LẬP TRÌNH NÂNG CAO/VocabLab/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-i767887d5e
