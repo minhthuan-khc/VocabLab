@@ -86,6 +86,7 @@ namespace VocabLab.Controllers
                 ModelState.Remove("Example");
             }
 
+            // Ghi log kiểm tra dữ liệu đầu vào bao gồm cả Pronunciation
             Console.WriteLine($"[Create POST] Received: Term={word.Term}, Category={word.Category}, Level={word.DifficultyLevel}");
             Console.WriteLine($"[Create POST] IsValid: {ModelState.IsValid}");
 
@@ -175,6 +176,9 @@ namespace VocabLab.Controllers
             }
         }
 
+        // =======================================================
+        // ĐÃ CẬP NHẬT: THÊM TRƯỜNG PRONUNCIATION CHO API AUTO-FETCH
+        // =======================================================
         [HttpGet("api/word/auto-fetch")]
         public IActionResult AutoFetch(string term)
         {
@@ -186,10 +190,12 @@ namespace VocabLab.Controllers
                 });
             }
 
+            // Bổ sung dữ liệu giả lập cho pronunciation khi người dùng gõ từ để hệ thống tự điền
             var data = new
             {
                 term = term,
                 definition = $"Định nghĩa giả định cho '{term}'.",
+                pronunciation = "/.../", // Chèn dữ liệu phiên âm mặc định/giả định vào đây
                 category = "General",
                 example = $"Ví dụ: {term} được sử dụng trong một câu."
             };

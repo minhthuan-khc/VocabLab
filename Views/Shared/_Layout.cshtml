@@ -227,10 +227,6 @@
            asp-controller="Word" asp-action="Quiz">
             <i class="ti ti-bolt"></i> Luyện tập
         </a>
-        <a class="nav-item-side @(ViewContext.RouteData.Values["action"]?.ToString() == "Match" ? "active" : "")"
-           asp-controller="Word" asp-action="Match">
-            <i class="ti ti-swords"></i> Đấu đối kháng
-        </a>
         <a class="nav-item-side @(ViewContext.RouteData.Values["action"]?.ToString() == "Privacy" ? "active" : "")"
            asp-controller="Home" asp-action="Privacy">
             <i class="ti ti-trophy"></i> Xếp hạng
