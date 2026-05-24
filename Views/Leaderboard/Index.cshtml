@@ -1,0 +1,566 @@
+@model VocabLab.ViewModels.LeaderboardViewModel
+@{
+    ViewData["Title"] = "Xếp hạng";
+    var isScore    = Model.ActiveTab == "score";
+    var activeList = isScore ? Model.ScoreRanking : Model.StreakRanking;
+    var unit       = isScore ? "⚡" : "🔥 ngày";
+
+    // Serialize heatmap data for JS
+    var heatmapJson = System.Text.Json.JsonSerializer.Serialize(Model.HeatmapData);
+}
+
+<div class="lb-page">
+
+    @* Cột trái *@
+    <div class="lb-left">
+        <h2 class="lb-title">🏆 Bảng Xếp Hạng</h2>
+
+        <div class="lb-tabs">
+            <a href="@Url.Action("Index", new { tab = "score" })"
+               class="lb-tab @(isScore ? "active" : "")">
+                ⚡ Điểm tổng
+            </a>
+            <a href="@Url.Action("Index", new { tab = "streak" })"
+               class="lb-tab @(!isScore ? "active" : "")">
+                🔥 Streak
+            </a>
+        </div>
+
+        <div class="lb-card">
+            @if (!activeList.Any())
+            {
+                <p class="lb-empty">Chưa có dữ liệu xếp hạng.</p>
+            }
+            else
+            {
+                <table class="lb-table">
+                    <thead>
+                        <tr>
+                            <th>Hạng</th>
+                            <th>Người dùng</th>
+                            <th>@(isScore ? "Điểm" : "Streak")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < activeList.Count; i++)
+                        {
+                            var entry    = activeList[i];
+                            var rank     = i + 1;
+                            var medal    = rank switch { 1 => "🥇", 2 => "🥈", 3 => "🥉", _ => rank.ToString() };
+                            var rowClass = rank <= 3 ? $"top-{rank}" : "";
+                            <tr class="@rowClass">
+                                <td class="lb-rank">@medal</td>
+                                <td class="lb-name">
+                                    <div class="lb-avatar">@entry.FullName[0]</div>
+                                    @entry.FullName
+                                </td>
+                                <td class="lb-value">@entry.Value @unit</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    @* Cột phải *@
+    <div class="lb-right">
+
+        @* Heatmap *@
+        <div class="lb-card heatmap-card">
+            <div class="heatmap-header">
+                <span class="heatmap-title">Hoạt động học tập</span>
+            </div>
+            <div class="heatmap-months" id="heatmapMonths"></div>
+            <div class="heatmap-grid-wrap">
+                <div class="heatmap-days">
+                    <span>T2</span><span></span>
+                    <span>T4</span><span></span>
+                    <span>T6</span><span></span>
+                    <span></span>
+                </div>
+                <div class="heatmap-grid" id="heatmapGrid"></div>
+            </div>
+            <div class="heatmap-legend">
+                <span>Ít</span>
+                <div class="heatmap-swatch" style="background:#e9d5ff"></div>
+                <div class="heatmap-swatch" style="background:#c084fc"></div>
+                <div class="heatmap-swatch" style="background:#9333ea"></div>
+                <div class="heatmap-swatch" style="background:#6b21a8"></div>
+                <span>Nhiều</span>
+            </div>
+        </div>
+
+        @* Widget Chuỗi chung *@
+        <div class="lb-card friend-card">
+            <div class="friend-tabs">
+                <button class="friend-tab active" onclick="switchFriendTab(this, 'chain')">🔗 Chuỗi chung</button>
+                <button class="friend-tab" onclick="switchFriendTab(this, 'invite')">✉️ Lời mời</button>
+                <button class="friend-tab" onclick="switchFriendTab(this, 'sent')"><i class="ti ti-send"></i> Đã gửi</button>
+            </div>
+            <div class="friend-content" id="tab-chain">
+                <div class="friend-empty">
+                    <div class="friend-empty-icon">🔗</div>
+                    <div class="friend-empty-title">Chuỗi học chung với bạn bè</div>
+                    <div class="friend-empty-desc">Kết bạn và cùng học mỗi ngày. Khi cả hai đều có hoạt động, chuỗi chung tăng lên 1.</div>
+                </div>
+            </div>
+            <div class="friend-content" id="tab-invite" style="display:none">
+                <div class="friend-empty">
+                    <div class="friend-empty-icon">✉️</div>
+                    <div class="friend-empty-title">Chưa có lời mời</div>
+                    <div class="friend-empty-desc">Khi bạn bè gửi lời mời chuỗi chung, lời mời sẽ xuất hiện tại đây.</div>
+                </div>
+            </div>
+            <div class="friend-content" id="tab-sent" style="display:none">
+                <div class="invite-form">
+                    <div class="invite-icon"><i class="ti ti-send"></i></div>
+                    <div class="invite-title">Mời bạn bè học cùng</div>
+                    <div class="invite-desc">Nhập email bạn bè để gửi lời mời chuỗi học chung.</div>
+                    <div class="invite-input-wrap">
+                        <input type="email" id="inviteEmail" class="invite-input" placeholder="email@example.com" />
+                        <button class="invite-btn" onclick="sendInvite()">
+                            <i class="ti ti-send"></i> Gửi
+                        </button>
+                    </div>
+                    <div id="inviteMsg" class="invite-msg"></div>
+                </div>
+
+                <div id="sentList" class="sent-list" style="display:none">
+                    <div class="sent-list-title">Đã gửi</div>
+                    <ul id="sentItems"></ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .lb-page {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    .lb-left  { flex: 1; min-width: 0; }
+    .lb-right { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+
+    .lb-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-main, #333);
+    }
+
+    .lb-tabs {
+        display: flex;
+        border-radius: 50px;
+        background: var(--sidebar-hover, #f0f0f0);
+        padding: 4px;
+        margin-bottom: 1.2rem;
+        gap: 4px;
+    }
+
+    .lb-tab {
+        flex: 1;
+        text-align: center;
+        padding: 9px 0;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        color: var(--text-muted, #666);
+        transition: all 0.2s;
+    }
+
+    .lb-tab.active {
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(124,58,237,0.3);
+    }
+
+    .lb-card {
+        background: var(--bg-widget, #fff);
+        border-radius: 16px;
+        box-shadow: var(--shadow-widget, 0 2px 12px rgba(0,0,0,0.07));
+        border: 1px solid var(--border-color, #e2e8f0);
+        overflow: hidden;
+    }
+
+    .lb-empty {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-label, #999);
+    }
+
+    .lb-table { width: 100%; border-collapse: collapse; }
+
+    .lb-table thead tr {
+        background: var(--bg-body, #f8f8f8);
+        color: var(--text-label, #888);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .lb-table th, .lb-table td { padding: 13px 18px; text-align: left; }
+
+    .lb-table tbody tr { border-top: 1px solid var(--border-color, #f0f0f0); transition: background 0.15s; }
+    .lb-table tbody tr:hover { background: var(--sidebar-hover, #fafafa); }
+    .lb-table tbody tr.top-1 { background: #fffbea; }
+    .lb-table tbody tr.top-2 { background: #f5f5f5; }
+    .lb-table tbody tr.top-3 { background: #fff5ee; }
+    [data-theme="dark"] .lb-table tbody tr.top-1 { background: #2a2500; }
+    [data-theme="dark"] .lb-table tbody tr.top-2 { background: #222; }
+    [data-theme="dark"] .lb-table tbody tr.top-3 { background: #2a1800; }
+
+    .lb-rank { font-size: 1.2rem; width: 56px; }
+
+    .lb-name { display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--text-main, #222); }
+
+    .lb-avatar {
+        width: 34px; height: 34px; border-radius: 50%;
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 0.9rem; flex-shrink: 0; text-transform: uppercase;
+    }
+
+    .lb-value { font-weight: 700; color: #f59e0b; }
+
+    /* HEATMAP */
+    .heatmap-card { padding: 16px; }
+
+    .heatmap-header { margin-bottom: 10px; }
+    .heatmap-title { font-weight: 700; font-size: 0.95rem; color: var(--text-main, #222); }
+
+    .heatmap-months {
+        display: flex;
+        font-size: 0.72rem;
+        color: var(--text-label, #888);
+        margin-left: 28px;
+        margin-bottom: 4px;
+        gap: 0;
+    }
+
+    .heatmap-grid-wrap { display: flex; gap: 4px; }
+
+    .heatmap-days {
+        display: grid;
+        grid-template-rows: repeat(7, 13px);
+        gap: 2px;
+        font-size: 0.65rem;
+        color: var(--text-label, #aaa);
+        text-align: right;
+        padding-right: 4px;
+        align-items: center;
+    }
+
+    .heatmap-grid {
+        display: grid;
+        grid-template-rows: repeat(7, 13px);
+        grid-auto-flow: column;
+        gap: 2px;
+        flex: 1;
+    }
+
+    .heatmap-cell {
+        width: 13px; height: 13px;
+        border-radius: 3px;
+        background: var(--border-color, #eee);
+        cursor: default;
+        transition: transform 0.1s;
+    }
+    .heatmap-cell:hover { transform: scale(1.3); }
+    .heatmap-cell[title]:hover { z-index: 10; }
+
+    .heatmap-legend {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 10px;
+        font-size: 0.72rem;
+        color: var(--text-label, #888);
+        justify-content: flex-end;
+    }
+
+    .heatmap-swatch { width: 13px; height: 13px; border-radius: 3px; }
+
+    /* FRIEND WIDGET */
+    .friend-tabs {
+        display: flex;
+        border-bottom: 2px solid var(--border-color, #e2e8f0);
+    }
+
+    .friend-tab {
+        flex: 1;
+        padding: 12px 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        background: transparent;
+        color: var(--text-muted, #666);
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.15s;
+    }
+
+    .friend-tab.active {
+        color: #7c3aed;
+        border-bottom-color: #22c55e;
+        background: #f5f3ff;
+    }
+
+    .friend-content { padding: 24px 16px; }
+
+    .friend-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .friend-empty-icon { font-size: 2rem; color: #c084fc; }
+    .friend-empty-title { font-weight: 700; font-size: 0.95rem; color: var(--text-main, #222); }
+    .friend-empty-desc { font-size: 0.82rem; color: var(--text-muted, #666); line-height: 1.5; }
+
+    /* INVITE FORM */
+    .invite-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+        padding: 4px 0 12px;
+    }
+
+    .invite-icon {
+        font-size: 2rem;
+        color: #a855f7;
+        line-height: 1;
+    }
+
+    .invite-icon i { font-size: 2rem; }
+
+    .invite-title { font-weight: 700; font-size: 0.95rem; color: var(--text-main, #222); }
+    .invite-desc  { font-size: 0.82rem; color: var(--text-muted, #666); line-height: 1.5; }
+
+    .invite-input-wrap {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        margin-top: 4px;
+    }
+
+    .invite-input {
+        flex: 1;
+        padding: 9px 12px;
+        border: 1.5px solid var(--border-color, #e2e8f0);
+        border-radius: 10px;
+        font-size: 0.88rem;
+        background: var(--bg-body, #f8fafc);
+        color: var(--text-main, #222);
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+    .invite-input:focus { border-color: #a855f7; }
+
+    .invite-btn {
+        padding: 9px 16px;
+        background: linear-gradient(135deg, #a855f7, #7c3aed);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        transition: opacity 0.15s;
+    }
+
+    .invite-btn:hover { opacity: 0.88; }
+
+    .invite-msg {
+        font-size: 0.82rem;
+        min-height: 18px;
+        font-weight: 600;
+    }
+
+    .invite-msg.success { color: #22c55e; }
+    .invite-msg.error   { color: #ef4444; }
+
+    .sent-list { margin-top: 12px; width: 100%; }
+    .sent-list-title { font-size: 0.78rem; font-weight: 700; color: var(--text-label, #888); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+
+    .sent-list ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+
+    .sent-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        background: var(--bg-body, #f8fafc);
+        border-radius: 10px;
+        font-size: 0.85rem;
+        color: var(--text-main, #222);
+    }
+
+    .sent-list li i { color: #a855f7; font-size: 1rem; }
+    .sent-list li .sent-email { flex: 1; }
+    .sent-list li .sent-time { font-size: 0.75rem; color: var(--text-label, #aaa); }
+
+    @@media (max-width: 900px) {
+        .lb-page { flex-direction: column; }
+        .lb-right { width: 100%; }
+    }
+</style>
+
+<script>
+(function () {
+    const heatmapData = @Html.Raw(heatmapJson);
+
+    const grid   = document.getElementById('heatmapGrid');
+    const months = document.getElementById('heatmapMonths');
+    // Dùng giờ địa phương của máy tính (không dùng UTC)
+    const now    = new Date();
+    const today  = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Tìm thứ 2 gần nhất <= 13 tuần trước
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - 13 * 7);
+    const dow = startDate.getDay();
+    const offset = dow === 0 ? -6 : 1 - dow;
+    startDate.setDate(startDate.getDate() + offset);
+
+    const maxVal = Math.max(1, ...Object.values(heatmapData).map(Number));
+
+    function getColor(val) {
+        if (!val || val === 0) return null;
+        const ratio = val / maxVal;
+        if (ratio < 0.25) return '#e9d5ff';
+        if (ratio < 0.5)  return '#c084fc';
+        if (ratio < 0.75) return '#9333ea';
+        return '#6b21a8';
+    }
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function fmtKey(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+
+    const monthNames = ['Thg 1','Thg 2','Thg 3','Thg 4','Thg 5','Thg 6','Thg 7','Thg 8','Thg 9','Thg 10','Thg 11','Thg 12'];
+    const monthTrack = {};
+    let weekIndex = 0;
+
+    // Tạo từng cột (tuần), mỗi cột 7 ô (T2→CN)
+    const cur = new Date(startDate);
+    while (cur <= today) {
+        const mKey = `${cur.getFullYear()}-${cur.getMonth()}`;
+        if (!monthTrack[mKey]) monthTrack[mKey] = weekIndex;
+
+        for (let d = 0; d < 7; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'heatmap-cell';
+
+            if (cur <= today) {
+                const key   = fmtKey(cur);
+                const val   = heatmapData[key] || 0;
+                const color = getColor(val);
+                if (color) cell.style.background = color;
+                const dateStr = cur.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
+                cell.title = val > 0 ? `${dateStr}: ${val} từ` : dateStr;
+            } else {
+                cell.style.opacity = '0';
+            }
+
+            grid.appendChild(cell);
+            cur.setDate(cur.getDate() + 1);
+        }
+        weekIndex++;
+    }
+
+    // Render nhãn tháng
+    const cellW = 15;
+    let monthsHtml = '';
+    let lastCol = -3;
+    for (const [key, col] of Object.entries(monthTrack)) {
+        if (col - lastCol >= 2) {
+            const parts = key.split('-');
+            monthsHtml += `<span style="position:absolute;left:${col * cellW}px">${monthNames[parseInt(parts[1])]}</span>`;
+            lastCol = col;
+        }
+    }
+    months.style.position = 'relative';
+    months.style.height = '16px';
+    months.innerHTML = monthsHtml;
+})();
+
+function sendInvite() {
+    const input = document.getElementById('inviteEmail');
+    const msg   = document.getElementById('inviteMsg');
+    const email = input.value.trim();
+
+    // Validate email
+    if (!email || !/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email)) {
+        msg.textContent = '⚠️ Vui lòng nhập email hợp lệ.';
+        msg.className = 'invite-msg error';
+        return;
+    }
+
+    // Load existing sent list
+    const stored = JSON.parse(localStorage.getItem('sentInvites') || '[]');
+
+    if (stored.find(x => x.email === email)) {
+        msg.textContent = '⚠️ Bạn đã gửi lời mời đến email này rồi.';
+        msg.className = 'invite-msg error';
+        return;
+    }
+
+    // Save
+    const now = new Date().toLocaleString('vi-VN');
+    stored.push({ email, time: now });
+    localStorage.setItem('sentInvites', JSON.stringify(stored));
+
+    input.value = '';
+    msg.textContent = '✅ Đã gửi lời mời thành công!';
+    msg.className = 'invite-msg success';
+    setTimeout(() => msg.textContent = '', 3000);
+
+    renderSentList(stored);
+}
+
+function renderSentList(list) {
+    const wrap  = document.getElementById('sentList');
+    const items = document.getElementById('sentItems');
+    if (!list || list.length === 0) { wrap.style.display = 'none'; return; }
+
+    wrap.style.display = 'block';
+    items.innerHTML = list.map(x => `
+        <li>
+            <i class="ti ti-send"></i>
+            <span class="sent-email">${x.email}</span>
+            <span class="sent-time">${x.time}</span>
+        </li>
+    `).join('');
+}
+
+// Load sent list on tab open
+document.addEventListener('DOMContentLoaded', function () {
+    const stored = JSON.parse(localStorage.getItem('sentInvites') || '[]');
+    renderSentList(stored);
+
+    // Allow Enter key to send
+    const input = document.getElementById('inviteEmail');
+    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') sendInvite(); });
+});
+
+function switchFriendTab(btn, tabId) {
+    document.querySelectorAll('.friend-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.friend-content').forEach(c => c.style.display = 'none');
+    btn.classList.add('active');
+    document.getElementById('tab-' + tabId).style.display = 'block';
+}
+</script>
