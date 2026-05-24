@@ -64,5 +64,30 @@ namespace VocabLab.Services
             await _context.UserWordProgresses
                 .Where(p => p.UserId == userId && p.IsLearned)
                 .CountAsync();
+
+        public async Task CreateAsync(Word word)
+        {
+            _context.Words.Add(word);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Word?> GetByIdAsync(int id) =>
+            await _context.Words.FirstOrDefaultAsync(w => w.Id == id);
+
+        public async Task UpdateAsync(Word word)
+        {
+            _context.Words.Update(word);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var word = await GetByIdAsync(id);
+            if (word != null)
+            {
+                _context.Words.Remove(word);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

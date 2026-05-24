@@ -1,0 +1,232 @@
+@model Word
+
+@{ 
+    ViewData["Title"] = "Thêm Từ Vựng Mới";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8"> <h2 class="text-center mb-4">Thêm Từ Vựng Mới</h2>
+
+            <div class="btn-group mb-4 w-100" role="group">
+                <button type="button" class="btn btn-outline-primary" onclick="showManualInput()">
+                    ✏️ Nhập Thủ Công
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="showAutoInput()">
+                    ⚡ Nhập 1 Từ
+                </button>
+                <button type="button" class="btn btn-outline-info" onclick="showMultiInput()">
+                    📋 Nhập Nhiều Từ
+                </button>
+            </div>
+
+            <div id="manualForm" class="form-section">
+                <form action="/Word/Create" method="post">
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="mb-3">
+                        <label for="Term" class="form-label">Từ Tiếng Anh *</label>
+                        <input id="Term" name="Term" class="form-control" placeholder="Ví dụ: Hello" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Definition" class="form-label">Định Nghĩa *</label>
+                        <textarea id="Definition" name="Definition" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Category" class="form-label">Thể Loại *</label>
+                        <input id="Category" name="Category" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Example" class="form-label">Ví Dụ (tùy chọn)</label>
+                        <textarea id="Example" name="Example" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="DifficultyLevel" class="form-label">Độ Khó</label>
+                        <select id="DifficultyLevel" name="DifficultyLevel" class="form-control">
+                            <option value="1">Dễ</option>
+                            <option value="2" selected>Trung Bình</option>
+                            <option value="3">Khó</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">💾 Lưu</button>
+                    <a href="@Url.Action("Index", "Word")" class="btn btn-secondary w-100 mt-2">❌ Hủy</a>
+                </form>
+            </div>
+
+            <div id="autoForm" class="form-section d-none">
+                <div class="mb-3">
+                    <label class="form-label">Cú pháp nhập nhanh *</label>
+                    <input type="text" class="form-control" id="autoTerm" placeholder="Ví dụ: Hello | Xin Chào | Greeting | Hello, Tom | Dễ">
+                    <small class="text-muted d-block mt-1">Thứ tự: Từ | Định nghĩa | Thể loại | Ví dụ | Độ khó</small>
+                </div>
+                <button type="button" class="btn btn-success w-100 mb-2" onclick="parseQuickInput()">⚡ Điền Nhanh</button>
+                
+                <div id="autoResult" class="mt-4 d-none">
+                    <form action="/Word/Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3"><label>Từ</label><input type="text" class="form-control" id="resultTerm" name="Term" readonly></div>
+                        <div class="mb-3"><label>Định Nghĩa</label><textarea class="form-control" id="resultDefinition" name="Definition" required></textarea></div>
+                        <div class="mb-3"><label>Thể Loại</label><input type="text" class="form-control" id="resultCategory" name="Category" required></div>
+                        <div class="mb-3"><label>Ví Dụ</label><textarea class="form-control" id="resultExample" name="Example"></textarea></div>
+                        <div class="mb-3">
+                            <label>Độ Khó</label>
+                            <select id="resultDifficultyLevel" name="DifficultyLevel" class="form-control">
+                                <option value="1">Dễ</option><option value="2">Trung Bình</option><option value="3">Khó</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">💾 Lưu</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="multiForm" class="form-section d-none">
+                <div class="mb-3">
+                    <label class="form-label">Nhập danh sách từ (Mỗi từ 1 dòng) *</label>
+                    <textarea class="form-control" id="multiTerm" rows="6" placeholder="Ví dụ:&#10;Hello | Xin Chào | Greeting | Hello Tom | Dễ&#10;Apple | Quả táo | Noun | This is an apple | Trung Bình"></textarea>
+                    <small class="text-info d-block mt-1">Cú pháp: Từ | Định nghĩa | Thể loại | Ví dụ | Độ khó. Xuống dòng (Enter) để nhập từ tiếp theo.</small>
+                </div>
+
+                <button type="button" class="btn btn-info text-white w-100 mb-2" onclick="parseMultiInput()">
+                    ⚙️ Xử Lý Dữ Liệu
+                </button>
+
+                <div id="multiResult" class="mt-4 d-none">
+                    <form action="/Word/BulkCreate" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="table-responsive mb-3">
+                            <table class="table table-bordered table-striped text-center">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Từ vựng</th>
+                                        <th>Định nghĩa</th>
+                                        <th>Thể loại</th>
+                                        <th>Độ khó</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="multiTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="hiddenInputsContainer"></div>
+
+                        <button type="submit" class="btn btn-primary w-100">💾 Lưu Tất Cả (<span id="wordCount">0</span> từ)</button>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-section { transition: opacity 0.3s ease; }
+    .d-none { display: none !important; }
+</style>
+
+<script>
+    // --- Các hàm chuyển đổi form ---
+    function showManualInput() { hideAll(); document.getElementById('manualForm').classList.remove('d-none'); }
+    function showAutoInput() { hideAll(); document.getElementById('autoForm').classList.remove('d-none'); }
+    function showMultiInput() { hideAll(); document.getElementById('multiForm').classList.remove('d-none'); }
+    
+    function hideAll() {
+        document.getElementById('manualForm').classList.add('d-none');
+        document.getElementById('autoForm').classList.add('d-none');
+        document.getElementById('multiForm').classList.add('d-none');
+        document.getElementById('autoResult').classList.add('d-none');
+        document.getElementById('multiResult').classList.add('d-none');
+    }
+
+    // --- Hàm xử lý cho Nhập 1 Từ (Giữ nguyên) ---
+    function parseQuickInput() {
+        const inputString = document.getElementById('autoTerm').value.trim();
+        if (!inputString.includes('|')) return alert('Vui lòng sử dụng dấu "|"');
+        
+        const parts = inputString.split('|').map(item => item.trim());
+        document.getElementById('resultTerm').value = parts[0] || '';
+        document.getElementById('resultDefinition').value = parts[1] || '';
+        document.getElementById('resultCategory').value = parts[2] || '';
+        document.getElementById('resultExample').value = parts[3] || '';
+
+        let levelValue = "2";
+        if (parts[4]) {
+            const l = parts[4].toLowerCase();
+            if (l.includes("dễ")) levelValue = "1";
+            else if (l.includes("khó")) levelValue = "3";
+        }
+        document.getElementById('resultDifficultyLevel').value = levelValue;
+        document.getElementById('autoResult').classList.remove('d-none');
+    }
+
+    // --- HÀM MỚI: Xử lý Nhập Nhiều Từ ---
+    function parseMultiInput() {
+        const text = document.getElementById('multiTerm').value.trim();
+        if (!text) return alert('Vui lòng nhập dữ liệu');
+
+        // Tách chuỗi bằng dấu Enter (\n) và loại bỏ các dòng rỗng
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        
+        const tbody = document.getElementById('multiTableBody');
+        const hiddenContainer = document.getElementById('hiddenInputsContainer');
+        
+        tbody.innerHTML = '';
+        hiddenContainer.innerHTML = '';
+        let validCount = 0;
+
+        lines.forEach((line) => {
+            const parts = line.split('|').map(item => item.trim());
+            
+            if (parts.length >= 1 && parts[0] !== '') {
+                const term = parts[0];
+                const definition = parts[1] || '';
+                const category = parts[2] || '';
+                const example = parts[3] || '';
+                
+                let levelValue = 2; // Default
+                let levelText = "Trung Bình";
+                
+                if (parts[4]) {
+                    const l = parts[4].toLowerCase();
+                    if (l.includes("dễ")) { levelValue = 1; levelText = "Dễ"; }
+                    else if (l.includes("khó")) { levelValue = 3; levelText = "Khó"; }
+                }
+
+                // 1. In ra bảng cho người dùng xem trước
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="fw-bold">${term}</td>
+                        <td>${definition}</td>
+                        <td>${category}</td>
+                        <td><span class="badge bg-secondary">${levelText}</span></td>
+                    </tr>
+                `;
+
+                // 2. Tạo các thẻ input ẩn chuẩn bị gửi lên C# (Lưu ý mảng words[index])
+                hiddenContainer.innerHTML += `
+                    <input type="hidden" name="words[${validCount}].Term" value="${term}">
+                    <input type="hidden" name="words[${validCount}].Definition" value="${definition}">
+                    <input type="hidden" name="words[${validCount}].Category" value="${category}">
+                    <input type="hidden" name="words[${validCount}].Example" value="${example}">
+                    <input type="hidden" name="words[${validCount}].DifficultyLevel" value="${levelValue}">
+                `;
+                
+                validCount++;
+            }
+        });
+
+        if (validCount === 0) {
+            return alert('Không tìm thấy từ vựng hợp lệ. Kiểm tra lại cú pháp.');
+        }
+
+        document.getElementById('wordCount').innerText = validCount;
+        document.getElementById('multiResult').classList.remove('d-none');
+    }
+</script>

@@ -1,0 +1,59 @@
+@model Word
+
+@{ 
+    ViewData["Title"] = "Sửa Từ Vựng";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2>✏️ Sửa Từ Vựng</h2>
+
+            <form method="post" action="@Url.Action("Edit", "Word", new { id = Model.Id })">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <div class="mb-3">
+                    <label class="form-label">Từ Tiếng Anh *</label>
+                    <input type="text" class="form-control" name="term" value="@Model.Term" placeholder="Ví dụ: Hello" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Định Nghĩa *</label>
+                    <textarea class="form-control" name="definition" rows="3" placeholder="Ví dụ: A greeting" required>@Model.Definition</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Thể Loại *</label>
+                    <input type="text" class="form-control" name="category" value="@Model.Category" placeholder="Ví dụ: Greeting" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Ví Dụ (tùy chọn)</label>
+                    <textarea class="form-control" name="example" rows="2" placeholder="Ví dụ: Hello, how are you?">@Model.Example</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">💾 Cập Nhật</button>
+                <a href="@Url.Action("Index", "Word")" class="btn btn-secondary w-100 mt-2">❌ Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    h2 {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 2rem;
+    }
+
+    .form-control, .form-label {
+        font-size: 1rem;
+    }
+
+    .btn {
+        font-weight: 500;
+        padding: 0.8rem;
+    }
+</style>
