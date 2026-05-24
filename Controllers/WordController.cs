@@ -62,13 +62,13 @@ namespace VocabLab.Controllers
             {
                 word.DifficultyLevel = 2;
             }
-            
+             ModelState.Remove("Progresses");
             if (string.IsNullOrEmpty(word.Example))
             {
                 word.Example = "";
                 // Bỏ qua lỗi validation cho trường Example
                 ModelState.Remove("Example"); 
-                ModelState.Remove("Progresses");
+               
             }
 
             Console.WriteLine($"[Create POST] Received: Term={word.Term}, Category={word.Category}, Level={word.DifficultyLevel}");
