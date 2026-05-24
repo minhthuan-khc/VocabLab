@@ -8,81 +8,277 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VocabLab.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    
     <style>
+        /* 1. HỆ THỐNG BIẾN MÀU TOÀN DIỆN */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-sidebar: transparent;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-label: #64748b;
+            --sidebar-hover: #e2e8f0;
+            --sidebar-active-bg: #eeedfe;
+            --sidebar-active-text: #6d28d9;
+            --bg-widget: #ffffff;
+            --shadow-widget: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-sidebar: transparent;
+            --border-color: #2a2a3e;
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --text-label: #94a3b8;
+            --sidebar-hover: #1e1e2e;
+            --sidebar-active-bg: #2d2b55;
+            --sidebar-active-text: #a78bfa;
+            --bg-widget: #1e1e2e;
+            --shadow-widget: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
         * { box-sizing: border-box; }
-        body { margin: 0; display: flex; flex-direction: column; min-height: 100vh; font-family: sans-serif; background: #f5f5f0; }
+
+        body { 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background: var(--bg-body); 
+            color: var(--text-main);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
         .app-wrapper { display: flex; flex: 1; }
 
-        /* SIDEBAR */
-        .sidebar { width: 220px; background: #fff; border-right: 1px solid #e5e5e0; display: flex; flex-direction: column; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; }
-        .sidebar-logo { padding: 1.25rem; font-size: 18px; font-weight: 600; color: #534AB7; border-bottom: 1px solid #e5e5e0; }
-        .sidebar-logo i { font-size: 20px; vertical-align: -3px; margin-right: 6px; }
-        .nav-item-side { display: flex; align-items: center; gap: 10px; padding: 11px 1.25rem; font-size: 14px; color: #555; text-decoration: none; transition: background 0.15s; }
-        .nav-item-side:hover { background: #f5f5f0; color: #222; text-decoration: none; }
-        .nav-item-side.active { background: #EEEDFE; color: #534AB7; font-weight: 500; }
-        .nav-item-side i { font-size: 18px; }
-        .sidebar-footer { margin-top: auto; padding: 1rem 1.25rem; border-top: 1px solid #e5e5e0; display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #EEEDFE; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #534AB7; flex-shrink: 0; }
+        /* 2. SIDEBAR HOÀN TOÀN TRÀN VIỀN KHÔNG NỀN CỨNG */
+        .sidebar { 
+            width: 250px; 
+            background: var(--bg-sidebar); 
+            border-right: none; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            position: fixed; 
+ Top: 0; 
+            left: 0; 
+            z-index: 100; 
+            padding: 0 14px; 
+        }
+        
+        /* Logo thương hiệu lớn */
+        .sidebar-logo { 
+            padding: 1.75rem 0.75rem; 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: #6d28d9; 
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+        }
+        [data-theme="dark"] .sidebar-logo { color: #a78bfa; }
+        .sidebar-logo i { font-size: 24px; vertical-align: -3px; margin-right: 6px; }
+        
+        /* Menu Items thiết kế thoáng theo ảnh mẫu */
+        .nav-item-side { 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            padding: 14px 1rem; 
+            font-size: 16px; 
+            font-weight: 600;
+            color: var(--text-muted); 
+            text-decoration: none; 
+            border-radius: 12px; 
+            margin-bottom: 6px;
+            transition: all 0.15s ease; 
+        }
+        .nav-item-side:hover { background: var(--sidebar-hover); color: var(--text-main); text-decoration: none; }
+        .nav-item-side.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); }
+        .nav-item-side i { font-size: 20px; } 
 
-        /* MAIN */
-        .main-content { margin-left: 220px; flex: 1; padding: 1.5rem 2rem; width: calc(100% - 220px); }
+        /* Phân tách giữa Menu và phần Cá nhân dưới đáy */
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 1rem 0.75rem;
+        }
+        
+        /* 3. KHU VỰC ĐÁY SIDEBAR (HỒ SƠ & TIỆN ÍCH) */
+        .sidebar-footer { 
+            margin-top: auto; 
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        /* Khối hồ sơ học viên theo phong cách luyentu.com */
+        .profile-container-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.15s;
+        }
+        .profile-container-link:hover { background: var(--sidebar-hover); text-decoration: none; color: inherit; }
+
+        /* Avatar dạng tròn có viền nổi bật */
+        .avatar-circle { 
+            width: 46px; 
+            height: 46px; 
+            border-radius: 50%; 
+            background: var(--sidebar-active-bg); 
+            border: 2px solid #22c55e; /* Viền xanh rực theo ảnh mẫu */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: var(--sidebar-active-text); 
+            flex-shrink: 0; 
+        }
+
+        .profile-text { display: flex; flex-direction: column; overflow: hidden; }
+        .profile-main-name { 
+            font-size: 15px; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-sub-link { font-size: 12px; color: var(--text-label); margin-top: 1px; }
+
+        /* Khối tiện ích đôi: Xu vàng & Nút chuyển theme */
+        .bottom-widgets {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 8px;
+        }
+
+        /* Ô hiện xu tích lũy */
+        .coin-widget {
+            background: var(--bg-widget);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #0284c7;
+            box-shadow: var(--shadow-widget);
+        }
+        [data-theme="dark"] .coin-widget { color: #38bdf8; }
+        .coin-widget i { color: #eab308; font-size: 18px; }
+
+        /* Nút chuyển chế độ Sáng/Tối */
+        .theme-toggle-widget {
+            background: var(--bg-widget);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            box-shadow: var(--shadow-widget);
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .theme-toggle-widget:hover { background: var(--sidebar-hover); }
+        .theme-toggle-widget i { font-size: 16px; }
+        
+        /* 4. KHÔNG GIAN NỘI DUNG CHÍNH */
+        .main-content { margin-left: 250px; flex: 1; padding: 2.5rem 3rem; width: calc(100% - 250px); }
+        .footer-text { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-label); }
     </style>
 </head>
 <body>
 <div class="app-wrapper">
 
-    <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="sidebar-logo">
             <i class="ti ti-book"></i>VocabLab
         </div>
 
-        <a class="nav-item-side @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+        <a class="nav-item-side @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
            asp-controller="Home" asp-action="Index">
             <i class="ti ti-home"></i> Trang chủ
         </a>
         <a class="nav-item-side @(ViewContext.RouteData.Values["controller"]?.ToString() == "Word" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
            asp-controller="Word" asp-action="Index">
-            <i class="ti ti-vocabulary"></i> Từ vựng
+            <i class="ti ti-vocabulary"></i> Bộ từ vựng
         </a>
-        <a class="nav-item-side @(ViewContext.RouteData.Values["action"]?.ToString() == "Quiz" ? "active" : "")"
+        <a class="nav-item-side @(ViewContext.RouteData.Values["controller"]?.ToString() == "Word" && ViewContext.RouteData.Values["action"]?.ToString() == "Quiz" ? "active" : "")"
            asp-controller="Word" asp-action="Quiz">
             <i class="ti ti-bolt"></i> Luyện tập
         </a>
-        <a class="nav-item-side"
+        <a class="nav-item-side @(ViewContext.RouteData.Values["action"]?.ToString() == "Match" ? "active" : "")"
+           asp-controller="Word" asp-action="Match">
+            <i class="ti ti-swords"></i> Đấu đối kháng
+        </a>
+        <a class="nav-item-side @(ViewContext.RouteData.Values["action"]?.ToString() == "Privacy" ? "active" : "")"
            asp-controller="Home" asp-action="Privacy">
             <i class="ti ti-trophy"></i> Xếp hạng
         </a>
-        <a class="nav-item-side"
-           asp-controller="Home" asp-action="Privacy">
+        <a class="nav-item-side" href="#">
             <i class="ti ti-settings"></i> Cài đặt
         </a>
+
+        <div class="sidebar-divider"></div>
 
         <div class="sidebar-footer">
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <div class="avatar">@User.Identity.Name?.Substring(0, 1).ToUpper()</div>
-                <div>
-                    <div style="font-size:13px;font-weight:500">@User.Identity.Name</div>
-                    <div style="font-size:11px;color:#888">Đã đăng nhập</div>
-                </div>
+                <a class="profile-container-link" asp-controller="Account" asp-action="Profile">
+                    <div class="avatar-circle">@User.Identity.Name?.Substring(0, 1).ToUpper()</div>
+                    <div class="profile-text">
+                        <div class="profile-main-name">@User.Identity.Name</div>
+                        <div class="profile-sub-link">Nhấn để xem hồ sơ</div>
+                    </div>
+                </a>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Login" style="font-size:13px;color:#534AB7">
-                    <i class="ti ti-login"></i> Đăng nhập
+                <a class="nav-item-side" asp-controller="Account" asp-action="Login">
+                    <i class="ti ti-login"></i> Đăng nhập tài khoản
                 </a>
             }
+
+            <div class="bottom-widgets">
+                <div class="coin-widget" title="Điểm tích lũy">
+                    <i class="ti ti-coin-filled"></i>
+                    <span>12,039</span>
+                </div>
+                
+                <div class="theme-toggle-widget" id="btnThemeToggle">
+                    <i class="ti ti-sun" id="themeWidgetIcon"></i>
+                    <span id="themeWidgetText">Sáng</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- NỘI DUNG CHÍNH -->
     <div class="main-content">
         <main role="main">
             @RenderBody()
         </main>
 
-        <footer style="margin-top:2rem;padding-top:1rem;border-top:1px solid #e5e5e0;font-size:12px;color:#999">
+        <footer class="footer-text">
             &copy; 2026 - VocabLab
         </footer>
     </div>
@@ -93,5 +289,37 @@
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("btnThemeToggle");
+        const themeIcon = document.getElementById("themeWidgetIcon");
+        const themeText = document.getElementById("themeWidgetText");
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+            
+            if (theme === "dark") {
+                themeIcon.className = "ti ti-moon";
+                themeText.textContent = "Tối";
+            } else {
+                themeIcon.className = "ti ti-sun";
+                themeText.textContent = "Sáng";
+            }
+        }
+
+        // Đọc cấu hình khởi tạo từ bộ nhớ
+        const initialTheme = localStorage.getItem("theme") || "light";
+        applyTheme(initialTheme);
+
+        // Bắt sự kiện click thay đổi trạng thái
+        toggleBtn.addEventListener("click", function () {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            const newTheme = currentTheme === "light" ? "dark" : "light";
+            applyTheme(newTheme);
+        });
+    });
+</script>
 </body>
 </html>

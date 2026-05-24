@@ -1,20 +1,276 @@
-@model List<QuizQuestion>
+@{
+    ViewData["Title"] = "Luyện tập";
+}
 
-<form id="quiz-form" asp-action="SubmitQuiz" method="post">
-@for (int i = 0; i < Model.Count; i++)
-{
-    <div class="question-card">
-        <h4>Từ: <strong>@Model[i].CorrectWord.Term</strong></h4>
-        @foreach (var option in Model[i].Options)
+<style>
+    /* 1. KHỞI TẠO BIẾN MÀU SẮC CHO CẢ 2 CHẾ ĐỘ */
+    :root {
+        /* Chế độ Ban Ngày (Light Mode) - Mặc định */
+        --bg-body: #f8fafc;
+        --bg-card: #ffffff;
+        --bg-select: #f1f5f9;
+        --border-color: #e2e8f0;
+        --border-select: #cbd5e1;
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --text-label: #64748b;
+        --history-row-border: #f1f5f9;
+        --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] {
+        /* Chế độ Ban Đêm (Dark Mode) */
+        --bg-body: #0f172a;
+        --bg-card: #1e293b;
+        --bg-select: #334155;
+        --border-color: #334155;
+        --border-select: #475569;
+        --text-main: #f8fafc;
+        --text-muted: #cbd5e1;
+        --text-label: #94a3b8;
+        --history-row-border: #334155;
+        --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 2. ÁP DỤNG BIẾN MÀU VÀ ĐỊNH DẠNG FONT CHỮ TRỰC QUAN */
+    body { 
+        background: var(--bg-body);
+        color: var(--text-main);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        transition: background 0.3s ease, color 0.3s ease; /* Tạo hiệu ứng chuyển nền mượt mà */
+    }
+
+    .practice-page { max-width: 960px; margin: 2rem auto; padding: 0 1rem; position: relative; }
+    
+    /* Khu vực thanh tiêu đề + Nút chuyển chế độ */
+    .header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-title { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 0; letter-spacing: -0.02em; }
+    
+    /* Style cho nút Switch Mode */
+    .theme-toggle-btn {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: var(--shadow-card);
+        transition: all 0.2s ease;
+    }
+    .theme-toggle-btn:hover { transform: scale(1.03); background: var(--bg-select); }
+
+    /* Filter bar */
+    .filter-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 2rem; }
+    .filter-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow-card); }
+    .filter-label { font-size: 13px; font-weight: 600; color: var(--text-label); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .filter-select { background: var(--bg-select); border: 1px solid var(--border-select); border-radius: 8px; padding: 10px 14px; color: var(--text-main); font-size: 15px; font-weight: 500; width: 100%; cursor: pointer; transition: border-color 0.2s; }
+    .filter-select:focus { border-color: #3b82f6; outline: none; }
+
+    /* Tiêu đề mục */
+    .section-label { font-size: 16px; font-weight: 600; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+    .word-count { color: #16a34a; font-size: 14px; font-weight: 600; margin-left: auto; background: #dcfce7; padding: 4px 12px; border-radius: 20px; }
+    [data-theme="dark"] .word-count { background: #14532d; color: #4ade80; } /* Tối ưu lại badge trên nền tối */
+    
+    /* Lưới trò chơi - Giữ nguyên các màu gradient rực rỡ độc lập với nền */
+    .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 2rem; }
+    .game-card { border-radius: 16px; padding: 1.5rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; color: #fff; text-decoration: none; display: block; box-shadow: var(--shadow-card); }
+    .game-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); color: #fff; text-decoration: none; }
+    
+    .game-card.purple { background: linear-gradient(135deg, #6d28d9, #9333ea); }
+    .game-card.orange { background: linear-gradient(135deg, #ea580c, #f97316); }
+    .game-card.teal   { background: linear-gradient(135deg, #0f766e, #06b6d4); }
+    .game-card.green  { background: linear-gradient(135deg, #15803d, #22c55e); }
+    .game-card.blue   { background: linear-gradient(135deg, #1d4ed8, #3b82f6); }
+    .game-card.pink   { background: linear-gradient(135deg, #be185d, #ec4899); }
+    
+    .game-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.95; }
+    .game-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.01em; }
+    .game-desc { font-size: 13px; opacity: 0.9; font-weight: 400; line-height: 1.4; }
+    .game-points { position: absolute; bottom: 12px; right: 14px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 3px 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+    .hot-badge { position: absolute; top: 12px; right: 12px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+
+    /* SRS Banner quảng cáo */
+    .srs-banner { background: linear-gradient(135deg, #6d28d9, #db2777); border-radius: 16px; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(109, 40, 217, 0.15); }
+    .srs-left { color: #fff; padding-right: 1.5rem; }
+    .srs-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .srs-sub { font-size: 14px; opacity: 0.92; line-height: 1.4; }
+    .srs-btn { background: #fff; color: #6d28d9; border: none; border-radius: 24px; padding: 12px 24px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: background 0.2s, transform 0.2s; }
+    .srs-btn:hover { background: #f8fafc; color: #4c1d95; text-decoration: none; transform: scale(1.02); }
+
+    /* Lịch sử trận đấu */
+    .history-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem 2rem; box-shadow: var(--shadow-card); }
+    .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; border-bottom: 2px solid var(--history-row-border); padding-bottom: 0.75rem; }
+    .history-title { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .history-link { font-size: 13px; font-weight: 500; color: #3b82f6; text-decoration: none; }
+    .history-link:hover { text-decoration: underline; }
+    .history-empty { color: var(--text-label); font-size: 14px; text-align: center; padding: 2rem 0; }
+    .history-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--history-row-border); font-size: 14px; color: var(--text-muted); }
+    .history-row:last-child { border-bottom: none; }
+    
+    .score-badge { background: #dcfce7; color: #15803d; border-radius: 8px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
+    [data-theme="dark"] .score-badge { background: #14532d; color: #4ade80; }
+</style>
+
+<div class="practice-page">
+
+    <!-- Bộ lọc -->
+    <div class="filter-bar">
+        <div class="filter-box">
+            <div class="filter-label">Bộ từ vựng</div>
+            <select class="filter-select">
+                <option>Tất cả bộ từ</option>
+                <option>Food</option>
+                <option>Animals</option>
+                <option>Travel</option>
+                <option>Business</option>
+            </select>
+        </div>
+        <div class="filter-box">
+            <div class="filter-label">Bộ lọc</div>
+            <select class="filter-select">
+                <option>Chưa thuộc</option>
+                <option>Đã thuộc</option>
+                <option>Tất cả</option>
+            </select>
+        </div>
+        <div class="filter-box">
+            <div class="filter-label">Thứ tự</div>
+            <select class="filter-select">
+                <option>Ngẫu nhiên</option>
+                <option>A → Z</option>
+                <option>Mới nhất</option>
+            </select>
+        </div>
+        <div class="filter-box">
+            <div class="filter-label">Số lượng</div>
+            <select class="filter-select">
+                <option>10 từ</option>
+                <option selected>20 từ</option>
+                <option>50 từ</option>
+                <option>Tất cả</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Chọn game -->
+    <div class="section-label">
+        <i class="ti ti-device-gamepad-2"></i> Chọn game:
+        <span class="word-count">@ViewBag.TotalWords từ sẵn sàng</span>
+    </div>
+
+    <div class="games-grid">
+        <a class="game-card purple" asp-controller="Word" asp-action="Flashcard">
+            <div class="game-icon"><i class="ti ti-cards"></i></div>
+            <div class="game-name">Flashcard</div>
+            <div class="game-desc">Lật thẻ học từ vựng</div>
+            <div class="game-points">+5 <i class="ti ti-coin" style="font-size:11px"></i></div>
+        </a>
+        <a class="game-card orange" asp-controller="Word" asp-action="Quiz">
+            <div class="game-icon"><i class="ti ti-pencil-check"></i></div>
+            <div class="game-name">Trắc nghiệm</div>
+            <div class="game-desc">Chọn đáp án đúng</div>
+            <div class="game-points">+10 <i class="ti ti-coin" style="font-size:11px"></i></div>
+        </a>
+        <a class="game-card teal" asp-controller="Word" asp-action="Match">
+            <div class="game-icon"><i class="ti ti-puzzle"></i></div>
+            <div class="game-name">Nối từ với nghĩa</div>
+            <div class="game-desc">Ghép đôi từ vựng và nghĩa</div>
+            <div class="game-points">+10 <i class="ti ti-coin" style="font-size:11px"></i></div>
+        </a>
+        <a class="game-card green" asp-controller="Word" asp-action="Typing">
+            <div class="game-icon"><i class="ti ti-keyboard"></i></div>
+            <div class="game-name">Gõ từ vựng</div>
+            <div class="game-desc">Nhìn nghĩa và gõ từ tiếng Anh</div>
+            <div class="game-points">+10 <i class="ti ti-coin" style="font-size:11px"></i></div>
+        </a>
+        <a class="game-card blue" asp-controller="Word" asp-action="Listening">
+            <div class="game-icon"><i class="ti ti-headphones"></i></div>
+            <div class="game-name">Nghe viết</div>
+            <div class="game-desc">Nghe phát âm và viết từ</div>
+            <div class="game-points">+15 <i class="ti ti-coin" style="font-size:11px"></i></div>
+        </a>
+        <a class="game-card pink" asp-controller="Word" asp-action="Quiz">
+            <div class="hot-badge">HOT 🔥</div>
+            <div class="game-icon"><i class="ti ti-flame"></i></div>
+            <div class="game-name">Tổng hợp</div>
+            <div class="game-desc">Hỗn hợp + Flappy Bird</div>
+            <div class="game-points">+20 <i class="ti ti-coin" style="font-size:11px"></i></div>
+        </a>
+    </div>
+
+    <!-- SRS Banner -->
+    <div class="srs-banner">
+        <div class="srs-left">
+            <div class="srs-title"><i class="ti ti-refresh"></i> Ôn tập ngắt quãng (SRS)</div>
+            <div class="srs-sub">Hệ thống tự động nhắc lại các từ vựng bạn sắp quên. Học ít, nhớ lâu!</div>
+        </div>
+        <a class="srs-btn" asp-controller="Word" asp-action="Quiz">
+            <i class="ti ti-player-play"></i> Bắt đầu ôn tập
+        </a>
+    </div>
+
+    <!-- Lịch sử -->
+    <div class="history-card">
+        <div class="history-header">
+            <div class="history-title"><i class="ti ti-calendar-stats"></i> Lịch sử đấu</div>
+            <a class="history-link" href="#">Xem thống kê →</a>
+        </div>
+        @if (ViewBag.History != null && ((List<dynamic>)ViewBag.History).Count > 0)
         {
-            <label>
-                <input type="radio" 
-                       name="answers[@Model[i].CorrectWord.Id]" 
-                       value="@(option == Model[i].CorrectWord.Definition)" />
-                @option
-            </label>
+            foreach (var item in (List<dynamic>)ViewBag.History)
+            {
+                <div class="history-row">
+                    <span>@item.GameName</span>
+                    <span style="color: var(--text-label)">@item.PlayedAt</span>
+                    <span class="score-badge">@item.Score điểm</span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="history-empty">Chưa có lịch sử luyện tập. Hãy bắt đầu ngay!</div>
         }
     </div>
-}
-    <button type="submit">Nộp bài</button>
-</form>
+</div>
+
+<!-- 3. ĐOẠN JAVASCRIPT ĐIỀU KHIỂN LOGIC CHUYỂN ĐỔI CHẾ ĐỘ VÀ LƯU TRỮ -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+        const themeText = document.getElementById("themeText");
+
+        // Hàm cập nhật chữ và icon trên nút bấm
+
+
+        // 1. Kiểm tra cấu hình bộ nhớ cũ của người dùng, nếu không có thì mặc định lấy chế độ "light"
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateButtonUI(savedTheme);
+
+        // 2. Xử lý sự kiện click chuyển giao diện khi click vào button
+        toggleBtn.addEventListener("click", function () {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            let newTheme = "light";
+
+            if (currentTheme === "light") {
+                newTheme = "dark";
+            }
+
+            // Gán thuộc tính giao diện lên thẻ html/root
+            document.documentElement.setAttribute("data-theme", newTheme);
+            // Lưu lại vào bộ nhớ trình duyệt
+            localStorage.setItem("theme", newTheme);
+            // Cập nhật lại Text hiển thị của nút
+            updateButtonUI(newTheme);
+        });
+    });
+</script>
