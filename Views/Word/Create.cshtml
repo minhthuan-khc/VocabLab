@@ -101,7 +101,7 @@
                         @Html.AntiForgeryToken()
                         
                         <div class="table-responsive mb-3">
-                            <table class="table table-bordered table-striped text-center">
+                            <table class="table table-bordered table-striped text-center theme-table">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Từ vựng</th>
@@ -129,6 +129,7 @@
 <style>
     .form-section { transition: opacity 0.3s ease; }
     .d-none { display: none !important; }
+    .theme-table tbody td { color: var(--text-main); }
 </style>
 
 <script>
