@@ -7,7 +7,7 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <h2>✏️ Sửa Từ Vựng</h2>
+            <h2 class="text-main">✏️ Sửa Từ Vựng</h2>
 
             <form method="post" action="@Url.Action("Edit", "Word", new { id = Model.Id })">
                 @Html.AntiForgeryToken()
@@ -44,7 +44,7 @@
 <style>
     h2 {
         font-weight: 700;
-        color: #333;
+        color: var(--text-main);
         margin-bottom: 2rem;
     }
 

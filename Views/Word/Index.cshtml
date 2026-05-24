@@ -4,96 +4,253 @@
     ViewData["Title"] = "Danh Sách Từ Vựng";
 }
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2>📚 Các Từ Đã Lưu</h2>
-                    <p class="text-muted mb-0">Tổng số từ: <strong>@(Model?.Count() ?? 0)</strong></p>
-                </div>
-                <a href="@Url.Action("Create", "Word")" class="btn btn-success btn-lg">
-                    ➕ Thêm Từ Mới
-                </a>
-            </div>
+<style>
+    :root {
+        --bg-body: #f8fafc;
+        --bg-card: #ffffff;
+        --bg-select: #f1f5f9;
+        --border-color: #e2e8f0;
+        --border-select: #cbd5e1;
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --text-label: #64748b;
+        --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        --table-bg: #ffffff;
+        --table-head-bg: #f8fafc;
+        --table-head-text: #0f172a;
+        --table-border: #e2e8f0;
+        --table-text: #0f172a;
+        --table-hover-bg: rgba(59, 130, 246, 0.08);
+        --table-striped-bg: rgba(15, 23, 42, 0.02);
+        --alert-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    }
 
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+    [data-theme="dark"] {
+        --bg-body: #0f172a;
+        --bg-card: #1e293b;
+        --bg-select: #334155;
+        --border-color: #334155;
+        --border-select: #475569;
+        --text-main: #f8fafc;
+        --text-muted: #cbd5e1;
+        --text-label: #94a3b8;
+        --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        --table-bg: #111827;
+        --table-head-bg: #1f2937;
+        --table-head-text: #f8fafc;
+        --table-border: #334155;
+        --table-text: #f8fafc;
+        --table-hover-bg: rgba(59, 130, 246, 0.16);
+        --table-striped-bg: rgba(148, 163, 184, 0.05);
+        --alert-shadow: 0 10px 20px rgba(15, 23, 42, 0.28);
+    }
 
-            @if (Model != null && Model.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped">
-                        <thead class="table-dark">
+    body {
+        background: var(--bg-body);
+        color: var(--text-main);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .page-shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 2.5rem;
+    }
+
+    .header-area {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        margin-bottom: 0;
+        font-size: 0.95rem;
+    }
+
+    .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .theme-toggle-btn {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 0.7rem 1rem;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow-card);
+        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+        transform: translateY(-1px);
+        background: var(--bg-select);
+        border-color: var(--border-select);
+    }
+
+    .table-wrapper {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 0.25rem;
+        box-shadow: var(--shadow-card);
+    }
+
+    .theme-table {
+        margin-bottom: 0;
+        --bs-table-bg: var(--table-bg);
+        --bs-table-color: var(--table-text);
+        --bs-table-striped-bg: var(--table-striped-bg);
+        --bs-table-hover-bg: var(--table-hover-bg);
+        --bs-table-border-color: var(--table-border);
+        border-color: var(--table-border);
+    }
+
+    .theme-table thead th {
+        background: var(--table-head-bg);
+        color: var(--table-head-text);
+        border-bottom: 1px solid var(--table-border);
+        font-weight: 700;
+    }
+
+    .theme-table tbody td,
+    .theme-table tbody th {
+        color: var(--table-text);
+        border-color: var(--table-border);
+        vertical-align: middle;
+    }
+
+    .theme-table tbody tr:hover td,
+    .theme-table tbody tr:hover th {
+        background: var(--table-hover-bg);
+    }
+
+    .badge-category {
+        background: #0ea5e9;
+        color: #ffffff;
+    }
+
+    [data-theme="dark"] .badge-category {
+        background: #0284c7;
+    }
+
+    .alert {
+        border-radius: 12px;
+        box-shadow: var(--alert-shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-lg {
+        padding: 0.8rem 1.35rem;
+        font-size: 1.05rem;
+    }
+
+    @@media (max-width: 768px) {
+        .header-area {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .toolbar-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+<div class="page-shell">
+    <div class="header-area">
+        <div>
+            <h2 class="page-title">📚 Các Từ Đã Lưu</h2>
+            <p class="page-subtitle">Tổng số từ: <strong>@(Model?.Count() ?? 0)</strong></p>
+        </div>
+
+        <div class="toolbar-actions">
+            <a href="@Url.Action("Create", "Word")" class="btn btn-success btn-lg">
+                ➕ Thêm Từ Mới
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-wrapper">
+            <div class="table-responsive">
+                <table class="table theme-table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Từ</th>
+                            <th>Định Nghĩa</th>
+                            <th>Thể Loại</th>
+                            <th>Ví Dụ</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var word in Model)
+                        {
                             <tr>
-                                <th>Từ</th>
-                                <th>Định Nghĩa</th>
-                                <th>Thể Loại</th>
-                                <th>Ví Dụ</th>
-                                <th>Hành Động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var word in Model)
-                            {
-                                <tr>
-                                    <td><strong>@word.Term</strong></td>
-                                    <td>@word.Definition</td>
-                                    <td>
-                                        <span class="badge bg-info">@word.Category</span>
-                                    </td>
-                                    <td>@word.Example</td>
-                                    <td>
+                                <td><strong>@word.Term</strong></td>
+                                <td>@word.Definition</td>
+                                <td>
+                                    <span class="badge badge-category">@word.Category</span>
+                                </td>
+                                <td>@word.Example</td>
+                                <td>
+                                    <div class="d-flex gap-2 flex-wrap">
                                         <a href="@Url.Action("Edit", "Word", new { id = word.Id })" class="btn btn-sm btn-primary">
                                             ✏️ Sửa
                                         </a>
                                         <a href="@Url.Action("Delete", "Word", new { id = word.Id })" class="btn btn-sm btn-danger" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
                                             🗑️ Xóa
                                         </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <h4 class="alert-heading">📭 Chưa có từ vựng</h4>
-                    <p>Bạn chưa thêm từ vựng nào. Hãy bấm nút "<strong>Thêm Từ Mới</strong>" để bắt đầu!</p>
-                </div>
-            }
-
-            <hr class="my-5">
-
-           
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h4 class="alert-heading">📭 Chưa có từ vựng</h4>
+            <p>Bạn chưa thêm từ vựng nào. Hãy bấm nút "<strong>Thêm Từ Mới</strong>" để bắt đầu!</p>
+        </div>
+    }
 </div>
-
-<style>
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 123, 255, 0.1);
-    }
-
-    .btn-lg {
-        padding: 0.8rem 1.5rem;
-        font-size: 1.1rem;
-    }
-
-    .alert {
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-        font-weight: 700;
-        color: #333;
-    }
-</style>
