@@ -1,0 +1,49 @@
+@model Word
+
+@{ 
+    ViewData["Title"] = "Xóa Từ Vựng";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading">⚠️ Cảnh Báo!</h4>
+                <p>Bạn chắc chắn muốn xóa từ vựng này không? Hành động này không thể hoàn tác!</p>
+                <hr>
+                <strong>Từ:</strong> @Model.Term <br>
+                <strong>Định Nghĩa:</strong> @Model.Definition
+            </div>
+
+            <form method="post" action="@Url.Action("Delete", "Word", new { id = Model.Id })">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="confirmed" value="true" />
+
+                <button type="submit" class="btn btn-danger w-100 btn-lg">
+                    🗑️ Xóa Vĩnh Viễn
+                </button>
+                <a href="@Url.Action("Index", "Word")" class="btn btn-secondary w-100 mt-2 btn-lg">
+                    ❌ Hủy
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .alert {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-lg {
+        padding: 0.8rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .alert h4 {
+        color: #721c24;
+    }
+</style>

@@ -1,3 +1,5 @@
+// WordService.cs
+
 using Microsoft.EntityFrameworkCore;
 using VocabLab.Data;
 using VocabLab.Models;
@@ -29,10 +31,8 @@ namespace VocabLab.Services
             string userId,
             int count = 10)
         {
-            // Lấy dữ liệu trước
             var allWords = await _context.Words.ToListAsync();
 
-            // Random bằng C#
             var words = allWords
                 .OrderBy(w => Guid.NewGuid())
                 .Take(count)
@@ -107,6 +107,32 @@ namespace VocabLab.Services
                     p.UserId == userId &&
                     p.IsLearned)
                 .CountAsync();
+        }
+
+        public async Task CreateAsync(Word word)
+        {
+            _context.Words.Add(word);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Word?> GetByIdAsync(int id) =>
+            await _context.Words.FirstOrDefaultAsync(w => w.Id == id);
+
+        public async Task UpdateAsync(Word word)
+        {
+            _context.Words.Update(word);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var word = await GetByIdAsync(id);
+
+            if (word != null)
+            {
+                _context.Words.Remove(word);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

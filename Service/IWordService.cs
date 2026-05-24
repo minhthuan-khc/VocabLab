@@ -6,8 +6,12 @@ namespace VocabLab.Services
     {
         Task<IEnumerable<Word>> GetAllAsync();
         Task<IEnumerable<Word>> GetByCategoryAsync(string category);
+        Task<Word?> GetByIdAsync(int id);
         Task<List<QuizQuestion>> GenerateQuizAsync(string userId, int count = 10);
         Task SaveProgressAsync(string userId, int wordId, bool isCorrect);
         Task<int> GetUserScoreAsync(string userId);
+        Task CreateAsync(Word word);
+        Task UpdateAsync(Word word);
+        Task DeleteAsync(int id);
     }
 }
