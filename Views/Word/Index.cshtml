@@ -2,28 +2,30 @@
 
 @{
     ViewData["Title"] = "Danh Sách Từ Vựng";
+    
+    // Tính toán số liệu thống kê (Giả lập cấu trúc biến từ Model của bạn)
+    int totalCount = Model?.Count() ?? 0;
+    int learnedCount = Model?.Count(w => w.DifficultyLevel == 1) ?? 0; // Thay thế bằng thuộc tính check đã thuộc thực tế của bạn
+    int notLearnedCount = totalCount - learnedCount;
+    int progressPercent = totalCount > 0 ? (int)Math.Round((double)learnedCount / totalCount * 100) : 0;
 }
 
 <style>
+    /* --- HỆ THỐNG BIẾN MÀU ĐỒNG BỘ THEO LAYOUT SIDEBAR --- */
     :root {
         --bg-body: #f8fafc;
         --bg-card: #ffffff;
         --bg-select: #f1f5f9;
         --border-color: #e2e8f0;
-        --border-select: #cbd5e1;
         --text-main: #0f172a;
         --text-muted: #475569;
         --text-label: #64748b;
-        --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-        --table-bg: #ffffff;
+        --shadow-card: 0 1px 3px rgba(0,0,0,0.05);
+        
         --table-head-bg: #f8fafc;
-        --table-head-text: #0f172a;
-        --table-border: #e2e8f0;
-        --table-text: #0f172a;
-        --table-hover-bg: rgba(59, 130, 246, 0.08);
-        --table-striped-bg: rgba(15, 23, 42, 0.02);
-        --alert-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+        --table-hover-bg: #f8fafc;
+        --badge-noun-bg: #e1f5ee;
+        --badge-noun-color: #0f6e56;
     }
 
     [data-theme="dark"] {
@@ -31,211 +33,267 @@
         --bg-card: #1e293b;
         --bg-select: #334155;
         --border-color: #334155;
-        --border-select: #475569;
         --text-main: #f8fafc;
         --text-muted: #cbd5e1;
         --text-label: #94a3b8;
         --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-        --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-        --table-bg: #111827;
+        
         --table-head-bg: #1f2937;
-        --table-head-text: #f8fafc;
-        --table-border: #334155;
-        --table-text: #f8fafc;
-        --table-hover-bg: rgba(59, 130, 246, 0.16);
-        --table-striped-bg: rgba(148, 163, 184, 0.05);
-        --alert-shadow: 0 10px 20px rgba(15, 23, 42, 0.28);
-    }
-
-    body {
-        background: var(--bg-body);
-        color: var(--text-main);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        transition: background 0.3s ease, color 0.3s ease;
+        --table-hover-bg: #1e1e2e;
+        --badge-noun-bg: #064e3b;
+        --badge-noun-color: #4ade80;
     }
 
     .page-shell {
         max-width: 1120px;
         margin: 0 auto;
-        padding: 1.5rem 1rem 2.5rem;
+        padding: 0.5rem 1rem 2.5rem;
     }
 
-    .header-area {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+    /* --- KHỐI THỐNG KÊ TRÊN ĐẦU (STATS GRID) --- */
+    .stats-horizontal-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 2rem;
     }
-
-    .page-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-main);
-        margin-bottom: 0.25rem;
-        letter-spacing: -0.02em;
-    }
-
-    .page-subtitle {
-        color: var(--text-muted);
-        margin-bottom: 0;
-        font-size: 0.95rem;
-    }
-
-    .toolbar-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    .theme-toggle-btn {
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        color: var(--text-main);
-        padding: 0.7rem 1rem;
-        border-radius: 999px;
-        cursor: pointer;
-        font-size: 0.95rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: var(--shadow-card);
-        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-    }
-
-    .theme-toggle-btn:hover {
-        transform: translateY(-1px);
-        background: var(--bg-select);
-        border-color: var(--border-select);
-    }
-
-    .table-wrapper {
+    .stat-pill-box {
         background: var(--bg-card);
         border: 1px solid var(--border-color);
         border-radius: 16px;
-        padding: 0.25rem;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 16px;
         box-shadow: var(--shadow-card);
     }
-
-    .theme-table {
-        margin-bottom: 0;
-        --bs-table-bg: var(--table-bg);
-        --bs-table-color: var(--table-text);
-        --bs-table-striped-bg: var(--table-striped-bg);
-        --bs-table-hover-bg: var(--table-hover-bg);
-        --bs-table-border-color: var(--table-border);
-        border-color: var(--table-border);
+    .stat-pill-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        flex-shrink: 0;
     }
+    .stat-pill-icon.blue { background: #0284c7; }
+    .stat-pill-icon.green { background: #16a34a; }
+    .stat-pill-icon.amber { background: #d97706; }
+    .stat-pill-icon.purple { background: #6d28d9; }
+    
+    .stat-pill-info { display: flex; flex-direction: column; }
+    .stat-pill-label { font-size: 11px; font-weight: 700; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-pill-value { font-size: 22px; font-weight: 800; color: var(--text-main); line-height: 1.2; margin-top: 2px; }
 
+    /* --- THANH TÌM KIẾM & HÀNH ĐỘNG (TOOLBAR) --- */
+    .toolbar-filter-row {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-card);
+    }
+    .search-input-group { position: relative; flex: 1; max-width: 320px; }
+    .search-input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-label); font-size: 16px; }
+    .custom-search-bar {
+        width: 100%;
+        background: var(--bg-body);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 9px 16px 9px 40px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .custom-search-bar:focus { outline: none; border-color: #6d28d9; }
+
+    .action-pill-btn {
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 24px;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(22, 163, 74, 0.15);
+        transition: opacity 0.15s;
+    }
+    .action-pill-btn:hover { opacity: 0.9; color: #fff; text-decoration: none; }
+
+    /* --- BẢNG DANH SÁCH TỪ VỰNG CHUẨN LUYENTU.COM --- */
+    .table-wrapper-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+    }
+    .theme-table { margin-bottom: 0; font-size: 15px; }
     .theme-table thead th {
         background: var(--table-head-bg);
-        color: var(--table-head-text);
-        border-bottom: 1px solid var(--table-border);
+        color: var(--text-label);
+        font-size: 12px;
         font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .theme-table tbody tr { transition: background 0.15s; }
+    .theme-table tbody tr:hover { background: var(--table-hover-bg); }
+    .theme-table tbody td { padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .theme-table tbody tr:last-child td { border-bottom: none; }
+
+    /* Loạt thiết kế chi tiết các ô cột dữ liệu */
+    .term-display-block { display: flex; flex-direction: column; gap: 2px; }
+    .term-text { font-size: 16px; font-weight: 700; color: var(--text-main); }
+    .pronunciation-text { font-size: 13px; color: var(--text-label); font-family: 'SFMono-Regular', Consolas, monospace; }
+    
+    .definition-text { font-weight: 600; color: var(--text-main); }
+    .example-text { font-size: 14px; color: var(--text-muted); font-style: italic; max-width: 350px; line-height: 1.4; }
+
+    /* Badge loại từ (Noun, Verb...) co gọn màu pastel */
+    .badge-word-type {
+        background: var(--badge-noun-bg);
+        color: var(--badge-noun-color);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        padding: 5px 10px;
+        border-radius: 6px;
+        display: inline-block;
     }
 
-    .theme-table tbody td,
-    .theme-table tbody th {
-        color: var(--table-text);
-        border-color: var(--table-border);
-        vertical-align: middle;
-    }
-
-    .theme-table tbody tr:hover td,
-    .theme-table tbody tr:hover th {
-        background: var(--table-hover-bg);
-    }
-
-    .badge-category {
-        background: #0ea5e9;
-        color: #ffffff;
-    }
-
-    [data-theme="dark"] .badge-category {
-        background: #0284c7;
-    }
-
-    .alert {
-        border-radius: 12px;
-        box-shadow: var(--alert-shadow);
+    /* Nhóm nút hành động nhỏ gọn */
+    .row-action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         border: 1px solid var(--border-color);
+        background: var(--bg-card);
+        color: var(--text-muted);
+        transition: all 0.15s;
     }
+    .row-action-btn.edit:hover { background: #eeedfe; color: #6d28d9; border-color: #a78bfa; }
+    .row-action-btn.delete:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
 
-    .btn-lg {
-        padding: 0.8rem 1.35rem;
-        font-size: 1.05rem;
+    @@media (max-width: 900px) {
+        .stats-horizontal-bar { grid-template-columns: repeat(2, 1fr); }
     }
-
-    @@media (max-width: 768px) {
-        .header-area {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .toolbar-actions {
-            width: 100%;
-            justify-content: flex-start;
-        }
+    @@media (max-width: 600px) {
+        .stats-horizontal-bar { grid-template-columns: 1fr; }
+        .toolbar-filter-row { flex-direction: column; align-items: stretch; }
+        .search-input-group { max-width: 100%; }
     }
 </style>
 
 <div class="page-shell">
-    <div class="header-area">
-        <div>
-            <h2 class="page-title">📚 Các Từ Đã Lưu</h2>
-            <p class="page-subtitle">Tổng số từ: <strong>@(Model?.Count() ?? 0)</strong></p>
+    
+    <div class="stats-horizontal-bar">
+        <div class="stat-pill-box">
+            <div class="stat-pill-icon blue"><i class="ti ti-books"></i></div>
+            <div class="stat-pill-info">
+                <span class="stat-pill-label">Tổng từ vựng</span>
+                <span class="stat-pill-value">@totalCount</span>
+            </div>
         </div>
+        <div class="stat-pill-box">
+            <div class="stat-pill-icon green"><i class="ti ti-circle-check"></i></div>
+            <div class="stat-pill-info">
+                <span class="stat-pill-label">Đã thuộc</span>
+                <span class="stat-pill-value">@learnedCount</span>
+            </div>
+        </div>
+        <div class="stat-pill-box">
+            <div class="stat-pill-icon amber"><i class="ti ti-clock-hour-4"></i></div>
+            <div class="stat-pill-info">
+                <span class="stat-pill-label">Chưa học</span>
+                <span class="stat-pill-value">@notLearnedCount</span>
+            </div>
+        </div>
+        <div class="stat-pill-box">
+            <div class="stat-pill-icon purple"><i class="ti ti-percentage"></i></div>
+            <div class="stat-pill-info">
+                <span class="stat-pill-label">Tỷ lệ thuộc</span>
+                <span class="stat-pill-value">@progressPercent%</span>
+            </div>
+        </div>
+    </div>
 
-        <div class="toolbar-actions">
-            <a href="@Url.Action("Create", "Word")" class="btn btn-success btn-lg">
-                ➕ Thêm Từ Mới
-            </a>
+    <div class="toolbar-filter-row">
+        <div class="search-input-group">
+            <i class="ti ti-search"></i>
+            <input type="text" id="vocabSearch" class="custom-search-bar" placeholder="Tìm kiếm từ vựng..." onkeyup="filterVocabulary()">
         </div>
+        
+        <a href="@Url.Action("Create", "Word")" class="action-pill-btn">
+            <i class="ti ti-plus"></i> Thêm từ với AI
+        </a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
+            <i class="ti ti-circle-check-filled me-1"></i> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (Model != null && Model.Any())
     {
-        <div class="table-wrapper">
+        <div class="table-wrapper-box">
             <div class="table-responsive">
-                <table class="table theme-table table-hover align-middle">
+                <table class="table theme-table align-middle" id="vocabTable">
                     <thead>
                         <tr>
-                            <th>Từ</th>
-                            <th>Định Nghĩa</th>
-                            <th>Thể Loại</th>
-                            <th>Ví Dụ</th>
-                            <th>Hành Động</th>
+                            <th class="ps-4">Từ vựng</th>
+                            <th>Nghĩa</th>
+                            <th>Loại từ</th>
+                            <th>Ví dụ</th>
+                            <th class="text-end pe-4">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var word in Model)
                         {
-                            <tr>
-                                <td><strong>@word.Term</strong></td>
-                                <td>@word.Definition</td>
-                                <td>
-                                    <span class="badge badge-category">@word.Category</span>
+                            <tr class="vocab-row">
+                                <td class="ps-4">
+                                    <div class="term-display-block">
+                                        <span class="term-text">@word.Term</span>
+                                        <span class="pronunciation-text">@word.Pronunciation</span>
+                                    </div>
                                 </td>
-                                <td>@word.Example</td>
                                 <td>
-                                    <div class="d-flex gap-2 flex-wrap">
-                                        <a href="@Url.Action("Edit", "Word", new { id = word.Id })" class="btn btn-sm btn-primary">
-                                            ✏️ Sửa
+                                    <span class="definition-text">@word.Definition</span>
+                                </td>
+                                <td>
+                                    <span class="badge-word-type">@word.Category</span>
+                                </td>
+                                <td>
+                                    <span class="example-text">@word.Example</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex gap-2">
+                                        <a href="@Url.Action("Edit", "Word", new { id = word.Id })" class="row-action-btn edit" title="Sửa">
+                                            <i class="ti ti-pencil"></i>
                                         </a>
-                                        <a href="@Url.Action("Delete", "Word", new { id = word.Id })" class="btn btn-sm btn-danger" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
-                                            🗑️ Xóa
+                                        <a href="@Url.Action("Delete", "Word", new { id = word.Id })" class="row-action-btn delete" title="Xóa" onclick="return confirm('Bạn chắc chắn muốn xóa từ vựng này?')">
+                                            <i class="ti ti-trash"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -248,9 +306,39 @@
     }
     else
     {
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <h4 class="alert-heading">📭 Chưa có từ vựng</h4>
-            <p>Bạn chưa thêm từ vựng nào. Hãy bấm nút "<strong>Thêm Từ Mới</strong>" để bắt đầu!</p>
+        <div class="p-5 text-center rounded-3 var-bg-card border border-dashed" style="background: var(--bg-card)">
+            <div class="text-muted mb-3" style="font-size: 48px;"><i class="ti ti-folder-off"></i></div>
+            <h5 class="fw-bold">Kho từ vựng của bạn đang trống</h5>
+            <p class="text-muted small">Hãy bắt đầu làm giàu vốn từ của mình bằng cách thêm các từ vựng mới!</p>
+            <a href="@Url.Action("Create", "Word")" class="btn btn-primary btn-sm px-4 py-2 mt-2" style="border-radius: 20px;">Tạo từ đầu tiên</a>
         </div>
     }
 </div>
+
+<script>
+    function filterVocabulary() {
+        const input = document.getElementById("vocabSearch");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("vocabTable");
+        if (!table) return;
+        
+        const rows = table.getElementsByClassName("vocab-row");
+
+        for (let i = 0; i < rows.length; i++) {
+            // Quét dữ liệu ở cột Từ vựng (ô đầu tiên) và cột Định nghĩa (ô thứ hai)
+            const termCell = rows[i].getElementsByClassName("term-text")[0];
+            const defCell = rows[i].getElementsByClassName("definition-text")[0];
+            
+            if (termCell || defCell) {
+                const termText = termCell ? termCell.textContent || termCell.innerText : "";
+                const defText = defCell ? defCell.textContent || defCell.innerText : "";
+                
+                if (termText.toLowerCase().indexOf(filter) > -1 || defText.toLowerCase().indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>

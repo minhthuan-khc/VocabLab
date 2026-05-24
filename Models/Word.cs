@@ -9,7 +9,7 @@ namespace VocabLab.Models
     {
         public int Id { get; set; }
         public string Term { get; set; }          // Từ tiếng Anh
-        public string Pronounciation { get; set;} //Phát âm
+        public string Pronunciation { get; set;} //Phát âm
         public string Definition { get; set; }    // Nghĩa
         public string Example { get; set; }       // Ví dụ
         public string Category { get; set; }      // Chủ đề (Animals, Food...)

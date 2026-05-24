@@ -21,7 +21,7 @@ namespace VocabLab.Data
                 {
                     Id = 1,
                     Term = "Apple",
-                    Pronounciation = "/ˈæpl/",
+                    Pronunciation = "/ˈæpl/",
                     Definition = "Quả táo",
                     Example = "I eat an apple every day.",
                     Category = "Food"
@@ -31,7 +31,7 @@ namespace VocabLab.Data
                 {
                     Id = 2,
                     Term = "Dog",
-                    Pronounciation = "/dɔːɡ/",
+                    Pronunciation = "/dɔːɡ/",
                     Definition = "Con chó",
                     Example = "The dog is very friendly.",
                     Category = "Animals"
