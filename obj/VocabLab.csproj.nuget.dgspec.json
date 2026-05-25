@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\HK6\\ProjectOOP\\VocabLab\\VocabLab.csproj": {}
+    "D:\\Tải liệu\\HK6\\KỸ THUẬT LẬP TRÌNH NÂNG CAO\\VocabLab\\VocabLab.csproj": {}
   },
   "projects": {
-    "D:\\HK6\\ProjectOOP\\VocabLab\\VocabLab.csproj": {
+    "D:\\Tải liệu\\HK6\\KỸ THUẬT LẬP TRÌNH NÂNG CAO\\VocabLab\\VocabLab.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\HK6\\ProjectOOP\\VocabLab\\VocabLab.csproj",
+        "projectUniqueName": "D:\\Tải liệu\\HK6\\KỸ THUẬT LẬP TRÌNH NÂNG CAO\\VocabLab\\VocabLab.csproj",
         "projectName": "VocabLab",
-        "projectPath": "D:\\HK6\\ProjectOOP\\VocabLab\\VocabLab.csproj",
-        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "D:\\HK6\\ProjectOOP\\VocabLab\\obj\\",
+        "projectPath": "D:\\Tải liệu\\HK6\\KỸ THUẬT LẬP TRÌNH NÂNG CAO\\VocabLab\\VocabLab.csproj",
+        "packagesPath": "C:\\Users\\GIA MIN\\.nuget\\packages\\",
+        "outputPath": "D:\\Tải liệu\\HK6\\KỸ THUẬT LẬP TRÌNH NÂNG CAO\\VocabLab\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\GIA MIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -30,6 +30,7 @@
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -38,10 +39,17 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
@@ -86,7 +94,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
