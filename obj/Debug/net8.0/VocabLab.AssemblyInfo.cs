@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VocabLab")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21c05dff95fc3534e8e93f14af6f8089f9fe68de")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f33d1cb38702eaa5342e9c1edc53e16b3f937c0")]
 [assembly: System.Reflection.AssemblyProductAttribute("VocabLab")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VocabLab")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
