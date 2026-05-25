@@ -27,7 +27,6 @@ namespace VocabLab.Controllers
         }
 
         // Đã mở lại Authorize để đảm bảo userId không bị null gây sập web
-        [Authorize]
         public async Task<IActionResult> Quiz()
         {
             var userId = UserHelper.GetUserId(HttpContext);

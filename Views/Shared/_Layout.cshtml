@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -37,6 +40,7 @@
             --sidebar-active-text: #a78bfa;
             --bg-widget: #1e1e2e;
             --shadow-widget: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            --modal-close-filter: invert(1) grayscale(1) brightness(2);
         }
 
         * { box-sizing: border-box; }
@@ -55,7 +59,7 @@
         
         .app-wrapper { display: flex; flex: 1; }
 
-        /* 2. SIDEBAR HOÀN TOÀN TRÀN VIỀN KHÔNG NỀN CỨNG */
+        /* 2. SIDEBAR HOÀN TOÀN TRÀN VIỀN */
         .sidebar { 
             width: 250px; 
             background: var(--bg-sidebar); 
@@ -64,13 +68,12 @@
             flex-direction: column; 
             min-height: 100vh; 
             position: fixed; 
- Top: 0; 
+            top: 0; 
             left: 0; 
             z-index: 100; 
             padding: 0 14px; 
         }
         
-        /* Logo thương hiệu lớn */
         .sidebar-logo { 
             padding: 1.75rem 0.75rem; 
             font-size: 22px; 
@@ -82,7 +85,6 @@
         [data-theme="dark"] .sidebar-logo { color: #a78bfa; }
         .sidebar-logo i { font-size: 24px; vertical-align: -3px; margin-right: 6px; }
         
-        /* Menu Items thiết kế thoáng theo ảnh mẫu */
         .nav-item-side { 
             display: flex; 
             align-items: center; 
@@ -100,14 +102,13 @@
         .nav-item-side.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); }
         .nav-item-side i { font-size: 20px; } 
 
-        /* Phân tách giữa Menu và phần Cá nhân dưới đáy */
         .sidebar-divider {
             height: 1px;
             background: var(--border-color);
             margin: 1rem 0.75rem;
         }
         
-        /* 3. KHU VỰC ĐÁY SIDEBAR (HỒ SƠ & TIỆN ÍCH) */
+        /* 3. KHU VỰC ĐÁY SIDEBAR */
         .sidebar-footer { 
             margin-top: auto; 
             display: flex;
@@ -116,36 +117,40 @@
             padding-bottom: 20px;
         }
 
-        /* Khối hồ sơ học viên theo phong cách luyentu.com */
-        .profile-container-link {
+        .profile-container-trigger {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 10px;
             border-radius: 14px;
-            text-decoration: none;
             color: inherit;
+            cursor: pointer;
+            user-select: none;
             transition: background 0.15s;
         }
-        .profile-container-link:hover { background: var(--sidebar-hover); text-decoration: none; color: inherit; }
+        .profile-container-trigger:hover { background: var(--sidebar-hover); }
 
-        /* Avatar dạng tròn có viền nổi bật */
+        .avatar-wrapper-green {
+            position: relative;
+            padding: 2px;
+            border: 2px solid #22c55e;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
         .avatar-circle { 
-            width: 46px; 
-            height: 46px; 
+            width: 40px; 
+            height: 40px; 
             border-radius: 50%; 
             background: var(--sidebar-active-bg); 
-            border: 2px solid #22c55e; /* Viền xanh rực theo ảnh mẫu */
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-size: 16px; 
             font-weight: 700; 
             color: var(--sidebar-active-text); 
-            flex-shrink: 0; 
         }
 
-        .profile-text { display: flex; flex-direction: column; overflow: hidden; }
+        .profile-text { display: flex; flex-direction: column; overflow: hidden; flex-grow: 1; }
         .profile-main-name { 
             font-size: 15px; 
             font-weight: 700; 
@@ -156,15 +161,14 @@
             text-overflow: ellipsis;
         }
         .profile-sub-link { font-size: 12px; color: var(--text-label); margin-top: 1px; }
+        .profile-right-icon { color: var(--text-label); font-size: 18px; display: flex; align-items: center; }
 
-        /* Khối tiện ích đôi: Xu vàng & Nút chuyển theme */
         .bottom-widgets {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
             gap: 8px;
         }
 
-        /* Ô hiện xu tích lũy */
         .coin-widget {
             background: var(--bg-widget);
             border: 1px solid var(--border-color);
@@ -181,7 +185,6 @@
         [data-theme="dark"] .coin-widget { color: #38bdf8; }
         .coin-widget i { color: #eab308; font-size: 18px; }
 
-        /* Nút chuyển chế độ Sáng/Tối */
         .theme-toggle-widget {
             background: var(--bg-widget);
             border: 1px solid var(--border-color);
@@ -202,9 +205,48 @@
         .theme-toggle-widget:hover { background: var(--sidebar-hover); }
         .theme-toggle-widget i { font-size: 16px; }
         
-        /* 4. KHÔNG GIAN NỘI DUNG CHÍNH */
         .main-content { margin-left: 250px; flex: 1; padding: 2.5rem 3rem; width: calc(100% - 250px); }
         .footer-text { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-label); }
+
+        /* 4. CARD THÔNG TIN TRONG POPUP MODAL (FORM CHỈNH SỬA) */
+        .detail-item-box {
+            background: var(--bg-login);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-label);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+        .detail-value-static { 
+            font-size: 15px; 
+            font-weight: 700; 
+            color: var(--text-label);
+            padding: 6px 0;
+        }
+        .detail-input-edit {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid transparent;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 4px 0;
+            transition: border-color 0.2s;
+        }
+        .detail-input-edit:focus {
+            outline: none;
+            border-bottom-color: #6d28d9;
+        }
+        [data-theme="dark"] .detail-input-edit:focus { border-bottom-color: #a78bfa; }
     </style>
 </head>
 <body>
@@ -238,15 +280,20 @@
         <div class="sidebar-divider"></div>
 
         <div class="sidebar-footer">
-            @if (User.Identity?.IsAuthenticated == true)
+            @if (HttpContextAccessor.HttpContext.Request.Cookies.TryGetValue("vocab_user", out var loggedInUser))
             {
-                <a class="profile-container-link" asp-controller="Account" asp-action="Profile">
-                    <div class="avatar-circle">@User.Identity.Name?.Substring(0, 1).ToUpper()</div>
+                <div class="profile-container-trigger" data-bs-toggle="modal" data-bs-target="#userProfileModal">
+                    <div class="avatar-wrapper-green">
+                        <div class="avatar-circle">@loggedInUser.Substring(0, 1).ToUpper()</div>
+                    </div>
                     <div class="profile-text">
-                        <div class="profile-main-name">@User.Identity.Name</div>
+                        <div class="profile-main-name">@loggedInUser</div>
                         <div class="profile-sub-link">Nhấn để xem hồ sơ</div>
                     </div>
-                </a>
+                    <div class="profile-right-icon">
+                        <i class="ti ti-user-scan"></i>
+                    </div>
+                </div>
             }
             else
             {
@@ -258,7 +305,7 @@
             <div class="bottom-widgets">
                 <div class="coin-widget" title="Điểm tích lũy">
                     <i class="ti ti-coin-filled"></i>
-                    <span>12,039</span>
+                    <span>12,049</span>
                 </div>
                 
                 <div class="theme-toggle-widget" id="btnThemeToggle">
@@ -281,12 +328,90 @@
 
 </div>
 
+<div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; color: var(--text-main); overflow: hidden;">
+            
+            <div class="modal-header border-0 pb-0" style="padding: 20px 20px 10px;">
+                <h5 class="modal-title fw-bold" id="userProfileModalLabel" style="font-size: 18px;">🪪 Hồ Sơ Học Viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: var(--modal-close-filter, none);"></button>
+            </div>
+            
+            <div class="modal-body" style="padding: 10px 20px 20px;">
+                <form id="profileEditForm" onsubmit="saveProfileChanges(event)">
+                    <div class="d-flex flex-column gap-3">
+                        
+                        <div class="detail-item-box" style="background: rgba(0,0,0,0.02);">
+                            <span class="detail-label">Tên người học (Cố định)</span>
+                            <div class="detail-value-static">
+                                <i class="ti ti-lock" style="font-size: 14px; margin-right: 4px;"></i>
+                                @(HttpContextAccessor.HttpContext.Request.Cookies.TryGetValue("vocab_user", out var userVal) ? userVal : "Học viên")
+                            </div>
+                        </div>
+
+                        <div class="detail-item-box">
+                            <label class="detail-label" for="inputLanguage">Ngôn ngữ đang học</label>
+                            <input type="text" id="inputLanguage" class="detail-input-edit" 
+                                   value="@(HttpContextAccessor.HttpContext.Request.Cookies.TryGetValue("vocab_lang", out var lang) ? lang : "Tiếng Anh (English)")" required />
+                        </div>
+
+                        <div class="detail-item-box">
+                            <label class="detail-label" for="inputExam">Tên cuộc thi mục tiêu</label>
+                            <input type="text" id="inputExam" class="detail-input-edit" style="color: #6d28d9; font-weight: 700;"
+                                   value="@(HttpContextAccessor.HttpContext.Request.Cookies.TryGetValue("vocab_exam", out var exam) ? exam : "Đánh giá năng lực / Học kỳ OOP")" required />
+                        </div>
+
+                        <div class="detail-item-box">
+                            <label class="detail-label" for="inputExamDate">Ngày thi dự kiến</label>
+                            <input type="text" id="inputExamDate" class="detail-input-edit" style="font-family: monospace;"
+                                   value="@(HttpContextAccessor.HttpContext.Request.Cookies.TryGetValue("vocab_date", out var date) ? date : "24 / 06 / 2026")" required />
+                        </div>
+
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 10px; font-weight: 600; padding: 10px; background: #6d28d9; border: none;">
+                            💾 Lưu thay đổi hồ sơ
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-2 pt-2" style="border-top: 1px dashed var(--border-color);">
+                    <a href="@Url.Action("Logout", "Account")" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px; font-weight: 600; padding: 8px;">
+                        <i class="ti ti-logout"></i> Đăng xuất tài khoản
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 
 <script>
+    // Hàm lưu thông tin hồ sơ chỉnh sửa trực tiếp vào Cookie mà không cần tải lại Backend nặng nề
+    function saveProfileChanges(event) {
+        event.preventDefault();
+        
+        const langVal = document.getElementById("inputLanguage").value;
+        const examVal = document.getElementById("inputExam").value;
+        const dateVal = document.getElementById("inputExamDate").value;
+        
+        // Thiết lập Cookie lưu trong 30 ngày công khai
+        const maxAge = 30 * 24 * 60 * 60;
+        document.cookie = `vocab_lang=${encodeURIComponent(langVal)}; max-age=${maxAge}; path=/`;
+        document.cookie = `vocab_exam=${encodeURIComponent(examVal)}; max-age=${maxAge}; path=/`;
+        document.cookie = `vocab_date=${encodeURIComponent(dateVal)}; max-age=${maxAge}; path=/`;
+        
+        // Hiện thông báo thành công và reload lại trang để giao diện Modal cập nhật dữ liệu mới liền
+        alert("🎉 Cập nhật thông tin hồ sơ cá nhân thành công!");
+        window.location.reload();
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         const toggleBtn = document.getElementById("btnThemeToggle");
         const themeIcon = document.getElementById("themeWidgetIcon");
@@ -305,11 +430,9 @@
             }
         }
 
-        // Đọc cấu hình khởi tạo từ bộ nhớ
         const initialTheme = localStorage.getItem("theme") || "light";
         applyTheme(initialTheme);
 
-        // Bắt sự kiện click thay đổi trạng thái
         toggleBtn.addEventListener("click", function () {
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const newTheme = currentTheme === "light" ? "dark" : "light";
