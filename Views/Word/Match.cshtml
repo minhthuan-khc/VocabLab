@@ -1,0 +1,71 @@
+@{ ViewData["Title"] = "Trò chơi nối từ"; }
+<style>
+    .match-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 800px; margin: 3rem auto; }
+    .match-item { background: var(--bg-card); border: 2px solid var(--border-color); color: var(--text-main); padding: 20px; text-align: center; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .match-item.selected { border-color: #3b82f6; background: var(--bg-select); }
+    .match-item.matched { visibility: hidden; pointer-events: none; }
+</style>
+
+<div class="container text-center mt-4">
+    <h3>Ghép đôi từ vựng với ý nghĩa chính xác</h3>
+    <div class="match-grid" id="match-grid"></div>
+</div>
+
+<script>
+    let selectedItem = null;
+    let pairsCount = 0;
+
+    async function loadMatchGame() {
+        const res = await fetch('/Word/GetWordsForGame?count=6'); // Lấy 6 từ tạo thành 12 thẻ
+        const words = await res.json();
+        pairsCount = words.length;
+
+        let items = [];
+        words.forEach(w => {
+            items.push({ id: w.id, text: w.english, type: 'eng' });
+            items.push({ id: w.id, text: w.vietnamese, type: 'vie' });
+        });
+        items.sort(() => 0.5 - Math.random());
+
+        const grid = document.getElementById("match-grid");
+        items.forEach(data => {
+            const block = document.createElement("div");
+            block.className = "match-item";
+            block.innerText = data.text;
+            block.dataset.id = data.id;
+            block.dataset.type = data.type;
+            block.onclick = () => handleSelect(block);
+            grid.appendChild(block);
+        });
+    }
+
+    function handleSelect(block) {
+        if(!selectedItem) {
+            selectedItem = block;
+            block.classList.add("selected");
+        } else {
+            if(selectedItem === block) {
+                block.classList.remove("selected");
+                selectedItem = null;
+                return;
+            }
+
+            if(selectedItem.dataset.id === block.dataset.id && selectedItem.dataset.type !== block.dataset.type) {
+                // Khớp cặp chính xác
+                selectedItem.classList.add("matched");
+                block.classList.add("matched");
+                pairsCount--;
+                if(pairsCount === 0) {
+                    alert("Xuất sắc! Bạn đã dọn sạch bảng.");
+                    location.reload();
+                }
+            } else {
+                // Sai cặp, reset hiệu ứng chọn
+                selectedItem.classList.remove("selected");
+            }
+            selectedItem = null;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadMatchGame);
+</script>

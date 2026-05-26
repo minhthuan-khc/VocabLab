@@ -1,0 +1,78 @@
+@{ ViewData["Title"] = "Trắc nghiệm từ vựng"; }
+<style>
+    .quiz-container { max-width: 600px; margin: 3rem auto; background: var(--bg-card); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); }
+    .option-btn { width: 100%; text-align: left; padding: 14px 20px; margin-bottom: 12px; border-radius: 10px; border: 1px solid var(--border-select); background: var(--bg-select); color: var(--text-main); font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .option-btn:hover { border-color: #3b82f6; }
+    .correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+    .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+</style>
+
+<div class="quiz-container">
+    <div class="d-flex justify-content-between mb-3">
+        <span id="progress" style="color: var(--text-label)">Câu hỏi 1/10</span>
+        <span id="score" style="color: #16a34a; font-weight: 700">Điểm: 0</span>
+    </div>
+    <h2 id="question-text" class="mb-4" style="color: var(--text-main)">...</h2>
+    <div id="options-group"></div>
+</div>
+
+<script>
+    let words = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    async function loadQuiz() {
+        const res = await fetch('/Word/GetWordsForGame?count=10');
+        words = await res.json();
+        generateQuestion();
+    }
+
+    function generateQuestion() {
+        if(currentIndex >= words.length) {
+            alert(`Chúc mừng! Bạn hoàn thành bài test với số điểm: ${score}`);
+            fetch(`/Word/SaveHistory?gameName=Trắc nghiệm&score=${score}`, {method: 'POST'});
+            return;
+        }
+        
+        document.getElementById("progress").innerText = `Câu hỏi ${currentIndex + 1}/${words.length}`;
+        const currentWord = words[currentIndex];
+        document.getElementById("question-text").innerText = `Nghĩa của từ "${currentWord.english}" là gì?`;
+
+        // Trộn đáp án bốc ngẫu nhiên từ các từ khác làm mồi nhử
+        let options = [currentWord.vietnamese];
+        let wrongWords = words.filter(w => w.id !== currentWord.id).map(w => w.vietnamese);
+        wrongWords = wrongWords.sort(() => 0.5 - Math.random()).slice(0, 3);
+        options = [...options, ...wrongWords].sort(() => 0.5 - Math.random());
+
+        const group = document.getElementById("options-group");
+        group.innerHTML = "";
+        options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, currentWord.vietnamese);
+            group.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const buttons = document.querySelectorAll(".option-btn");
+        buttons.forEach(b => b.disabled = true); // Khóa click bừa
+
+        if(selected === correct) {
+            btn.classList.add("correct");
+            score += 10;
+            document.getElementById("score").innerText = `Điểm: ${score}`;
+        } else {
+            btn.classList.add("wrong");
+            buttons.forEach(b => { if(b.innerText === correct) b.classList.add("correct"); });
+        }
+
+        setTimeout(() => {
+            currentIndex++;
+            generateQuestion();
+        }, 1500);
+    }
+
+    document.addEventListener("DOMContentLoaded", loadQuiz);
+</script>

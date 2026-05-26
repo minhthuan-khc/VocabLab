@@ -1,0 +1,56 @@
+@{ ViewData["Title"] = "Luyện viết từ vựng"; }
+<style>
+    .typing-box { max-width: 500px; margin: 4rem auto; padding: 2rem; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); text-align: center; }
+    .input-spell { width: 100%; font-size: 1.5rem; padding: 10px; border-radius: 8px; border: 2px solid var(--border-select); text-align: center; background: var(--bg-select); color: var(--text-main); }
+    .input-spell:focus { border-color: #10b981; outline: none; }
+</style>
+
+<div class="typing-box">
+    <h5 style="color: var(--text-label)">Nhìn nghĩa đoán từ:</h5>
+    <h1 id="hint-vie" class="my-4" style="color: #10b981">...</h1>
+    <input type="text" id="user-input" class="input-spell" autocomplete="off" placeholder="Gõ từ tiếng Anh tại đây..." />
+    <p id="feedback" class="mt-3 font-weight-bold"></p>
+</div>
+
+<script>
+    let words = [];
+    let index = 0;
+
+    async function initTyping() {
+        const res = await fetch('/Word/GetWordsForGame?count=10');
+        words = await res.json();
+        nextWord();
+    }
+
+    function nextWord() {
+        if(index >= words.length) {
+            alert("Bạn đã hoàn thành phần thi viết từ!");
+            return;
+        }
+        document.getElementById("hint-vie").innerText = words[index].vietnamese;
+        const inp = document.getElementById("user-input");
+        inp.value = "";
+        inp.focus();
+        document.getElementById("feedback").innerText = "";
+    }
+
+    document.getElementById("user-input").addEventListener("keyup", function(e) {
+        if(e.key === "Enter") {
+            const target = words[index].english.trim().toLowerCase();
+            const current = this.value.trim().toLowerCase();
+            const feedback = document.getElementById("feedback");
+
+            if(current === target) {
+                feedback.innerText = "Chính xác! 🎉";
+                feedback.style.color = "#10b981";
+                index++;
+                setTimeout(nextWord, 1000);
+            } else {
+                feedback.innerText = `Chưa đúng rồi! Hãy thử lại.`;
+                feedback.style.color = "#ef4444";
+            }
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", initTyping);
+</script>

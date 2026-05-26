@@ -54,12 +54,32 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/HK6/ProjectOOP/VocabLab/Views/Word/Flashcard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxGbGFzaGNhcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/HK6/ProjectOOP/VocabLab/Views/Word/GameQuiz.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxHYW1lUXVpei5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/HK6/ProjectOOP/VocabLab/Views/Word/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/HK6/ProjectOOP/VocabLab/Views/Word/Listening.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxMaXN0ZW5pbmcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/HK6/ProjectOOP/VocabLab/Views/Word/Match.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxNYXRjaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/HK6/ProjectOOP/VocabLab/Views/Word/Quiz.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxRdWl6LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/HK6/ProjectOOP/VocabLab/Views/Word/Typing.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV29yZFxUeXBpbmcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/HK6/ProjectOOP/VocabLab/Views/_ViewImports.cshtml]

@@ -1,0 +1,51 @@
+@{ ViewData["Title"] = "Luyện nghe viết"; }
+<style>
+    .listen-box { max-width: 500px; margin: 4rem auto; padding: 2.5rem; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); text-align: center; }
+    .audio-btn { width: 80px; height: 80px; border-radius: 50%; background: #3b82f6; color: white; font-size: 30px; border: none; cursor: pointer; transition: transform 0.2s; }
+    .audio-btn:hover { transform: scale(1.1); }
+</style>
+
+<div class="listen-box">
+    <h3>Nghe và viết lại từ</h3>
+    <div class="my-4">
+        <button class="audio-btn" onclick="playAudio()"><i class="ti ti-volume"></i></button>
+    </div>
+    <input type="text" id="listen-input" class="form-control form-control-lg text-center" autocomplete="off" placeholder="Bạn nghe thấy từ gì?" />
+    <button class="btn btn-primary mt-3 w-100" onclick="checkListening()">Kiểm tra kết quả</button>
+    <div id="result-msg" class="mt-3 font-weight-bold"></div>
+</div>
+
+<script>
+    let words = [];
+    let index = 0;
+
+    async function initListening() {
+        const res = await fetch('/Word/GetWordsForGame?count=10');
+        words = await res.json();
+        if(words.length > 0) playAudio();
+    }
+
+    function playAudio() {
+        if(index < words.length) {
+            new Audio(words[index].audioUrl).play();
+        }
+    }
+
+    function checkListening() {
+        const input = document.getElementById("listen-input").value.trim().toLowerCase();
+        const correct = words[index].english.trim().toLowerCase();
+        const msg = document.getElementById("result-msg");
+
+        if(input === correct) {
+            msg.innerHTML = `Chính xác! <b>${words[index].english}</b>: ${words[index].vietnamese}`;
+            msg.style.color = "#10b981";
+            index++;
+            document.getElementById("listen-input").value = "";
+            setTimeout(() => { msg.innerText = ""; playAudio(); }, 2000);
+        } else {
+            msg.innerText = "Sai rồi, hãy nghe kĩ lại nhé!";
+            msg.style.color = "#ef4444";
+        }
+    }
+    document.addEventListener("DOMContentLoaded", initListening);
+</script>

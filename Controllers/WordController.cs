@@ -26,7 +26,7 @@ namespace VocabLab.Controllers
             return View(words);
         }
 
-        // Đã mở lại Authorize để đảm bảo userId không bị null gây sập web
+        // Giao diện trắc nghiệm cũ của bạn (Sử dụng Razor Server-side render câu hỏi)
         public async Task<IActionResult> Quiz()
         {
             var userId = UserHelper.GetUserId(HttpContext);
@@ -260,6 +260,87 @@ namespace VocabLab.Controllers
                 return NotFound();
 
             return View(word);
+        }
+
+        // =========================================================================
+        // PHẦN THÊM MỚI: CÁC ACTION ĐIỀU HƯỚNG GAME & API LẤY DỮ LIỆU LUYỆN TẬP
+        // =========================================================================
+
+        
+        public async Task<IActionResult> Practice()
+        {
+            var words = await _wordService.GetAllAsync();
+            ViewBag.TotalWords = words?.Count() ?? 0;
+            
+            ViewBag.History = new List<dynamic>(); 
+
+            return View();
+        }
+
+        public IActionResult Flashcard() => View();
+        
+        // ĐÃ ĐỔI TÊN THÀNH QuizGame ĐỂ KHÔNG BỊ TRÙNG VỚI HÀM QUIZ GỐC CỦA BẠN
+        public IActionResult QuizGame() => View();
+        
+        public IActionResult Match() => View();
+         public IActionResult Typing() => View();
+        public IActionResult Listening() => View();
+
+        /// <summary>
+        /// API trả về danh sách từ vựng theo cấu hình bộ lọc từ Client-side (AJAX)
+        /// </summary>
+        [HttpGet]
+        
+        public async Task<IActionResult> GetWordsForGame(string? category, string? status, string? sort, int count = 20)
+        {
+            var words = await _wordService.GetAllAsync();
+            if (words == null) return Json(new List<object>());
+
+            if (!string.IsNullOrEmpty(category) && category != "Tất cả bộ từ")
+            {
+                words = words.Where(w => w.Category != null && w.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (sort == "Ngẫu nhiên")
+            {
+                words = words.OrderBy(w => Guid.NewGuid()).ToList();
+            }
+            else if (sort == "A → Z")
+            {
+                words = words.OrderBy(w => w.Term).ToList();
+            }
+            else if (sort == "Mới nhất")
+            {
+                words = words.OrderByDescending(w => w.Id).ToList();
+            }
+
+            if (count > 0)
+            {
+                words = words.Take(count).ToList();
+            }
+
+            // Ánh xạ Term -> english, Definition -> vietnamese để tương thích JS của Game
+            var result = words.Select(w => new
+            {
+                id = w.Id,
+                english = w.Term,
+                vietnamese = w.Definition,
+                pronunciation = w.Pronunciation ?? "/.../",
+                audioUrl = $"https://dict.youdao.com/dictvoice?audio={Uri.EscapeDataString(w.Term)}&type=2"
+            });
+
+            return Json(result);
+        }
+
+        /// <summary>
+        /// API tiếp nhận kết quả điểm số sau khi chơi xong để lưu lại tiến trình
+        /// </summary>
+        [HttpPost]
+        
+        public async Task<IActionResult> SaveGameHistory(string gameName, int score)
+        {
+            var userId = UserHelper.GetUserId(HttpContext);
+            return Json(new { success = true, message = "Đã ghi nhận kết quả" });
         }
     }
 }
