@@ -290,7 +290,7 @@ namespace VocabLab.Migrations
                         {
                             Id = 1,
                             Category = "Food",
-                            CreatedAt = new DateTime(2026, 5, 24, 22, 4, 47, 722, DateTimeKind.Local).AddTicks(1665),
+                            CreatedAt = new DateTime(2026, 5, 25, 23, 37, 39, 623, DateTimeKind.Local).AddTicks(3897),
                             Definition = "Quả táo",
                             DifficultyLevel = 0,
                             Example = "I eat an apple every day.",
@@ -301,7 +301,7 @@ namespace VocabLab.Migrations
                         {
                             Id = 2,
                             Category = "Animals",
-                            CreatedAt = new DateTime(2026, 5, 24, 22, 4, 47, 722, DateTimeKind.Local).AddTicks(1684),
+                            CreatedAt = new DateTime(2026, 5, 25, 23, 37, 39, 623, DateTimeKind.Local).AddTicks(3917),
                             Definition = "Con chó",
                             DifficultyLevel = 0,
                             Example = "The dog is very friendly.",

@@ -3,9 +3,8 @@
 @{
     ViewData["Title"] = "Danh Sách Từ Vựng";
     
-    // Tính toán số liệu thống kê (Giả lập cấu trúc biến từ Model của bạn)
     int totalCount = Model?.Count() ?? 0;
-    int learnedCount = Model?.Count(w => w.DifficultyLevel == 1) ?? 0; // Thay thế bằng thuộc tính check đã thuộc thực tế của bạn
+    int learnedCount = Model?.Count(w => w.DifficultyLevel == 1) ?? 0;
     int notLearnedCount = totalCount - learnedCount;
     int progressPercent = totalCount > 0 ? (int)Math.Round((double)learnedCount / totalCount * 100) : 0;
 }
@@ -125,85 +124,82 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        text-decoration: none;
+        cursor: pointer;
         box-shadow: 0 2px 4px rgba(22, 163, 74, 0.15);
         transition: opacity 0.15s;
     }
-    .action-pill-btn:hover { opacity: 0.9; color: #fff; text-decoration: none; }
+    .action-pill-btn:hover { opacity: 0.9; color: #fff; }
+    .action-pill-btn.btn-purple { background: #6d28d9; box-shadow: 0 2px 4px rgba(109, 40, 217, 0.15); }
 
-    /* --- BẢNG DANH SÁCH TỪ VỰNG CHUẨN LUYENTU.COM --- */
-    .table-wrapper-box {
+    /* --- CẤU TRÚC KHỐI CHỦ ĐỀ (TOPIC BOX) --- */
+    .topic-container {
         background: var(--bg-card);
         border: 1px solid var(--border-color);
         border-radius: 16px;
-        overflow: hidden;
+        margin-bottom: 1.5rem;
         box-shadow: var(--shadow-card);
+        overflow: hidden;
     }
-    .theme-table { margin-bottom: 0; font-size: 15px; }
-    .theme-table thead th {
+    .topic-header {
         background: var(--table-head-bg);
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .topic-title { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0; }
+    .topic-actions { display: flex; gap: 10px; }
+    .btn-add-word-inline { background: rgba(22, 163, 74, 0.1); color: #16a34a; border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s; }
+    .btn-add-word-inline:hover { background: #16a34a; color: #fff; }
+
+    /* --- BẢNG DANH SÁCH TỪ VỰNG --- */
+    .theme-table { margin-bottom: 0; font-size: 15px; width: 100%; }
+    .theme-table thead th {
+        background: transparent;
         color: var(--text-label);
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        padding: 14px 16px;
+        padding: 12px 16px;
         border-bottom: 1px solid var(--border-color);
     }
     .theme-table tbody tr { transition: background 0.15s; }
     .theme-table tbody tr:hover { background: var(--table-hover-bg); }
-    .theme-table tbody td { padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .theme-table tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
     .theme-table tbody tr:last-child td { border-bottom: none; }
 
-    /* Loạt thiết kế chi tiết các ô cột dữ liệu */
     .term-display-block { display: flex; flex-direction: column; gap: 2px; }
-    .term-text { font-size: 16px; font-weight: 700; color: var(--text-main); }
-    .pronunciation-text { font-size: 13px; color: var(--text-label); font-family: 'SFMono-Regular', Consolas, monospace; }
-    
+    .term-text { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .pronunciation-text { font-size: 12px; color: var(--text-label); font-family: 'SFMono-Regular', Consolas, monospace; }
     .definition-text { font-weight: 600; color: var(--text-main); }
-    .example-text { font-size: 14px; color: var(--text-muted); font-style: italic; max-width: 350px; line-height: 1.4; }
+    .example-text { font-size: 13px; color: var(--text-muted); font-style: italic; max-width: 350px; line-height: 1.4; }
 
-    /* Badge loại từ (Noun, Verb...) co gọn màu pastel */
-    .badge-word-type {
-        background: var(--badge-noun-bg);
-        color: var(--badge-noun-color);
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-        padding: 5px 10px;
-        border-radius: 6px;
-        display: inline-block;
-    }
-
-    /* Nhóm nút hành động nhỏ gọn */
-    .row-action-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--border-color);
-        background: var(--bg-card);
-        color: var(--text-muted);
-        transition: all 0.15s;
-    }
+    .badge-word-type { background: var(--badge-noun-bg); color: var(--badge-noun-color); font-size: 11px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+    .row-action-btn { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); transition: all 0.15s; }
     .row-action-btn.edit:hover { background: #eeedfe; color: #6d28d9; border-color: #a78bfa; }
     .row-action-btn.delete:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
 
-    @@media (max-width: 900px) {
-        .stats-horizontal-bar { grid-template-columns: repeat(2, 1fr); }
-    }
-    @@media (max-width: 600px) {
-        .stats-horizontal-bar { grid-template-columns: 1fr; }
-        .toolbar-filter-row { flex-direction: column; align-items: stretch; }
-        .search-input-group { max-width: 100%; }
-    }
+    /* --- THIẾT KẾ THÀNH PHẦN FORM TRONG POPUP --- */
+    .form-section-box { background: transparent; border: none; padding: 0; }
+    .tab-navigation-bar { display: flex; background: var(--bg-hover); padding: 4px; border-radius: 10px; gap: 4px; }
+    .tab-btn { flex: 1; border: none; background: transparent; padding: 8px 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .tab-btn.active { background: var(--bg-card); color: var(--sidebar-active-text); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .custom-form-label { font-size: 11px; font-weight: 700; color: var(--text-label); text-transform: uppercase; margin-bottom: 4px; display: block; }
+    .custom-form-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+    .custom-form-input:focus { outline: none; border-color: var(--sidebar-active-text); }
+    .process-btn { background: #0284c7; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+    .action-btn-group { display: flex; gap: 12px; }
+    .save-btn { flex: 2; background: var(--sidebar-active-text); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; }
+    .cancel-btn { flex: 1; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 500; }
+
+    @@media (max-width: 900px) { .stats-horizontal-bar { grid-template-columns: repeat(2, 1fr); } }
+    @@media (max-width: 600px) { .stats-horizontal-bar { grid-template-columns: 1fr; } .toolbar-filter-row { flex-direction: column; align-items: stretch; } .search-input-group { max-width: 100%; } }
 </style>
 
 <div class="page-shell">
-    
+    <!-- STATS BAR -->
     <div class="stats-horizontal-bar">
         <div class="stat-pill-box">
             <div class="stat-pill-icon blue"><i class="ti ti-books"></i></div>
@@ -235,15 +231,23 @@
         </div>
     </div>
 
+    <!-- TOOLBAR ROW -->
     <div class="toolbar-filter-row">
         <div class="search-input-group">
             <i class="ti ti-search"></i>
-            <input type="text" id="vocabSearch" class="custom-search-bar" placeholder="Tìm kiếm từ vựng..." onkeyup="filterVocabulary()">
+            <input type="text" id="vocabSearch" class="custom-search-bar" placeholder="Tìm kiếm từ vựng hoặc nghĩa..." onkeyup="filterVocabulary()">
         </div>
         
-        <a href="@Url.Action("Create", "Word")" class="action-pill-btn">
-            <i class="ti ti-plus"></i> Thêm từ với AI
-        </a>
+        <div class="d-flex gap-2">
+            <!-- NÚT THÊM CHỦ ĐỀ: Kích hoạt Popup tạo chủ đề -->
+            <button type="button" class="action-pill-btn btn-purple" data-bs-toggle="modal" data-bs-target="#createTopicModal" onclick="document.getElementById('newTopicNameInput').value=''">
+                <i class="ti ti-folder-plus"></i> Thêm Chủ Đề
+            </button>
+            <!-- NÚT THÊM TỪ TỰ DO: Mặc định đẩy vào nhóm Chung -->
+            <button type="button" class="action-pill-btn" onclick="openCreateModal('Chung')">
+                <i class="ti ti-plus"></i> Thêm Từ Vựng
+            </button>
+        </div>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -254,78 +258,308 @@
         </div>
     }
 
-    @if (Model != null && Model.Any())
-    {
-        <div class="table-wrapper-box">
-            <div class="table-responsive">
-                <table class="table theme-table align-middle" id="vocabTable">
-                    <thead>
-                        <tr>
-                            <th class="ps-4">Từ vựng</th>
-                            <th>Nghĩa</th>
-                            <th>Loại từ</th>
-                            <th>Ví dụ</th>
-                            <th class="text-end pe-4">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var word in Model)
-                        {
-                            <tr class="vocab-row">
-                                <td class="ps-4">
-                                    <div class="term-display-block">
-                                        <span class="term-text">@word.Term</span>
-                                        <span class="pronunciation-text">@word.Pronunciation</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="definition-text">@word.Definition</span>
-                                </td>
-                                <td>
-                                    <span class="badge-word-type">@word.Category</span>
-                                </td>
-                                <td>
-                                    <span class="example-text">@word.Example</span>
-                                </td>
-                                <td class="text-end pe-4">
-                                    <div class="d-inline-flex gap-2">
-                                        <a href="@Url.Action("Edit", "Word", new { id = word.Id })" class="row-action-btn edit" title="Sửa">
-                                            <i class="ti ti-pencil"></i>
-                                        </a>
-                                        <a href="@Url.Action("Delete", "Word", new { id = word.Id })" class="row-action-btn delete" title="Xóa" onclick="return confirm('Bạn chắc chắn muốn xóa từ vựng này?')">
-                                            <i class="ti ti-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <!-- AREA HIỂN THỊ CÁC CHỦ ĐỀ -->
+    <div id="topicsWrapper">
+        @if (Model != null && Model.Any())
+        {
+            var defaultTopics = new List<string> { "Chung", "Giao Tiếp", "Công Việc", "Du Lịch" };
+            
+            foreach (var topic in defaultTopics)
+            {
+                <div class="topic-container" id="topic-section-@topic">
+                    <div class="topic-header">
+                        <h3 class="topic-title"><i class="ti ti-folder"></i> <span class="topic-name-text">@topic</span></h3>
+                        <div class="topic-actions">
+                            <button type="button" class="btn-add-word-inline" onclick="openCreateModal('@topic')">
+                                <i class="ti ti-plus"></i> Thêm từ vào đây
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table theme-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4" style="width: 25%">Từ vựng</th>
+                                    <th style="width: 25%">Nghĩa</th>
+                                    <th style="width: 15%">Từ loại</th>
+                                    <th style="width: 25%">Ví dụ</th>
+                                    <th class="text-end pe-4" style="width: 10%">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody class="vocab-tbody">
+                                @foreach (var word in Model)
+                                {
+                                    if (topic == "Chung")
+                                    {
+                                        <tr class="vocab-row">
+                                            <td class="ps-4">
+                                                <div class="term-display-block">
+                                                    <span class="term-text">@word.Term</span>
+                                                    <span class="pronunciation-text">@word.Pronunciation</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="definition-text">@word.Definition</span></td>
+                                            <td><span class="badge-word-type">@word.Category</span></td>
+                                            <td><span class="example-text">@word.Example</span></td>
+                                            <td class="text-end pe-4">
+                                                <div class="d-inline-flex gap-2">
+                                                    <a href="@Url.Action("Edit", "Word", new { id = word.Id })" class="row-action-btn edit" title="Sửa"><i class="ti ti-pencil"></i></a>
+                                                    <a href="@Url.Action("Delete", "Word", new { id = word.Id })" class="row-action-btn delete" title="Xóa" onclick="return confirm('Bạn chắc chắn muốn xóa?')"><i class="ti ti-trash"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="p-5 text-center rounded-3 border border-dashed" style="background: var(--bg-card)">
+                <div class="text-muted mb-3" style="font-size: 48px;"><i class="ti ti-folder-off"></i></div>
+                <h5 class="fw-bold">Kho từ vựng của bạn đang trống</h5>
+                <p class="text-muted small">Hãy bắt đầu tạo chủ đề hoặc bấm nút thêm từ vựng để kích hoạt kho từ.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 1. MODAL POPUP THÊM CHỦ ĐỀ XINH XẮN -->
+<!-- ========================================== -->
+<div class="modal fade" id="createTopicModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content" style="border-radius: 16px; background: var(--bg-card); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-card);">
+            <div class="modal-header border-0 pb-0" style="padding: 1.5rem 1.5rem 0 1.5rem;">
+                <h2 class="modal-title" style="font-weight: 700; color: var(--text-main); font-size: 1.25rem;">📁 Tạo Chủ Đề Mới</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem;">
+                <div class="mb-4">
+                    <label class="custom-form-label">Tên chủ đề từ vựng *</label>
+                    <input type="text" id="newTopicNameInput" class="custom-form-input accent-input" placeholder="Ví dụ: Công Nghệ, Du Lịch, IELTS..." style="font-size: 15px; padding: 11px 14px;" />
+                </div>
+                <div class="action-btn-group">
+                    <button type="button" class="save-btn" style="background: #6d28d9;" onclick="submitNewTopic()">
+                        <i class="ti ti-folder-plus"></i> Tạo Chủ Đề
+                    </button>
+                    <button type="button" class="cancel-btn" data-bs-dismiss="modal">Hủy</button>
+                </div>
             </div>
         </div>
-    }
-    else
-    {
-        <div class="p-5 text-center rounded-3 var-bg-card border border-dashed" style="background: var(--bg-card)">
-            <div class="text-muted mb-3" style="font-size: 48px;"><i class="ti ti-folder-off"></i></div>
-            <h5 class="fw-bold">Kho từ vựng của bạn đang trống</h5>
-            <p class="text-muted small">Hãy bắt đầu làm giàu vốn từ của mình bằng cách thêm các từ vựng mới!</p>
-            <a href="@Url.Action("Create", "Word")" class="btn btn-primary btn-sm px-4 py-2 mt-2" style="border-radius: 20px;">Tạo từ đầu tiên</a>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 2. MODAL POPUP THÊM TỪ VỰNG ĐA NĂNG -->
+<!-- ========================================== -->
+<div class="modal fade" id="createWordModal" tabindex="-1" aria-labelledby="createWordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; background: var(--bg-card); border: 1px solid var(--border-color); overflow: hidden;">
+            
+            <div class="modal-header border-0 pb-0" style="padding: 1.5rem 1.5rem 0 1.5rem;">
+                <h2 class="modal-title" id="createWordModalLabel" style="font-weight: 700; color: var(--text-main); font-size: 1.4rem;">✨ Thêm Từ Mới Vào Chủ Đề: <span id="targetTopicBadge" class="text-primary"></span></h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" style="padding: 1.5rem;">
+                <div class="tab-navigation-bar mb-4">
+                    <button type="button" class="tab-btn active" id="btnManual" onclick="switchTab('manualForm', this)"><i class="ti ti-edit"></i> Nhập Thủ Công</button>
+                    <button type="button" class="tab-btn" id="btnAuto" onclick="switchTab('autoForm', this)"><i class="ti ti-bolt"></i> Nhập Nhanh 1 Từ</button>
+                    <button type="button" class="tab-btn" id="btnMulti" onclick="switchTab('multiForm', this)"><i class="ti ti-forms"></i> Nhập Nhiều Từ (Bulk)</button>
+                </div>
+
+                <!-- FORM A: NHẬP THỦ CÔNG -->
+                <div id="manualForm" class="form-section-box">
+                    <form action="/Word/Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Term" class="custom-form-label">Từ Tiếng Anh *</label>
+                                <input id="Term" name="Term" class="custom-form-input" placeholder="Ví dụ: assignment" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="Pronunciation" class="custom-form-label">Phát âm (Phiên âm)</label>
+                                <input id="Pronunciation" name="Pronunciation" class="custom-form-input" placeholder="Ví dụ: /əˈsaɪn.mənt/" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Definition" class="custom-form-label">Định Nghĩa (Nghĩa tiếng Việt) *</label>
+                            <input id="Definition" name="Definition" class="custom-form-input" placeholder="Ví dụ: bài tập lớn, nhiệm vụ" required />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Category" class="custom-form-label">Từ Loại *</label>
+                                <input id="Category" name="Category" class="custom-form-input" placeholder="Ví dụ: Noun, Verb, Adj..." required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="DifficultyLevel" class="custom-form-label">Độ Khó</label>
+                                <select id="DifficultyLevel" name="DifficultyLevel" class="custom-form-input">
+                                    <option value="1">🟢 Dễ</option>
+                                    <option value="2" selected>🟡 Trung Bình</option>
+                                    <option value="3">🔴 Khó</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="Example" class="custom-form-label">Ví Dụ Thực Tế</label>
+                            <textarea id="Example" name="Example" class="custom-form-input pt-2" rows="2" placeholder="Ví dụ: I have to complete this assignment by Friday."></textarea>
+                        </div>
+
+                        <div class="action-btn-group">
+                            <button type="submit" class="save-btn"><i class="ti ti-device-floppy"></i> Lưu Từ Vựng</button>
+                            <button type="button" class="cancel-btn" data-bs-dismiss="modal">Hủy bỏ</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- FORM B: NHẬP NHANH -->
+                <div id="autoForm" class="form-section-box d-none">
+                    <div class="mb-3">
+                        <label class="custom-form-label">Cú pháp phân tách nhanh *</label>
+                        <input type="text" class="custom-form-input accent-input" id="autoTerm" placeholder="Từ vựng | Phát âm | Định nghĩa | Từ loại | Ví dụ | Độ khó">
+                        <small class="hint-text">Cấu trúc: laptop | /ˈlæp.tɒp/ | máy tính xách tay | Noun | My new laptop | Dễ</small>
+                    </div>
+                    <button type="button" class="process-btn mb-4" onclick="parseQuickInput()"><i class="ti ti-wand"></i> Phân tích cú pháp</button>
+                    
+                    <div id="autoResult" class="d-none pt-3" style="border-top: 1px dashed var(--border-color)">
+                        <form action="/Word/Create" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="custom-form-label">Từ vựng</label><input type="text" class="custom-form-input" id="resultTerm" name="Term" readonly></div>
+                                <div class="col-md-6 mb-3"><label class="custom-form-label">Phát âm</label><input type="text" class="custom-form-input" id="resultPronunciation" name="Pronunciation"></div>
+                            </div>
+                            <div class="mb-3"><label class="custom-form-label">Định Nghĩa</label><input type="text" class="custom-form-input" id="resultDefinition" name="Definition" required></div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="custom-form-label">Từ Loại</label><input type="text" class="custom-form-input" id="resultCategory" name="Category" required></div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="custom-form-label">Độ Khó</label>
+                                    <select id="resultDifficultyLevel" name="DifficultyLevel" class="custom-form-input">
+                                        <option value="1">Dễ</option><option value="2">Trung Bình</option><option value="3">Khó</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4"><label class="custom-form-label">Ví Dụ</label><textarea class="custom-form-input pt-2" id="resultExample" name="Example" rows="2"></textarea></div>
+                            <button type="submit" class="save-btn w-100"><i class="ti ti-device-floppy"></i> Lưu Từ Vựng</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- FORM C: NHẬP BULK -->
+                <div id="multiForm" class="form-section-box d-none">
+                    <div class="mb-3">
+                        <label class="custom-form-label">Nhập danh sách từ vựng (Mỗi từ 1 dòng) *</label>
+                        <textarea class="custom-form-input pt-2 font-monospace" id="multiTerm" rows="5" placeholder="laptop | /ˈlæp.tɒp/ | máy tính xách tay | Noun | My new laptop | Dễ"></textarea>
+                    </div>
+                    <button type="button" class="process-btn mb-3" onclick="parseMultiInput()"><i class="ti ti-cpu"></i> Trích xuất dữ liệu</button>
+
+                    <div id="multiResult" class="d-none">
+                        <form action="/Word/BulkCreate" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="table-responsive mb-3 rounded-3 border" style="max-height: 200px; overflow-y: auto;">
+                                <table class="table table-hover align-middle mb-0 text-center" style="font-size: 13px;">
+                                    <thead class="table-light">
+                                        <tr><th>Từ vựng / Phát âm</th><th>Định nghĩa</th><th>Từ loại</th><th>Độ khó</th></tr>
+                                    </thead>
+                                    <tbody id="multiTableBody"></tbody>
+                                </table>
+                            </div>
+                            <div id="hiddenInputsContainer"></div>
+                            <button type="submit" class="save-btn w-100 py-2"><i class="ti ti-cloud-upload"></i> Xác nhận lưu tất cả (<span id="wordCount">0</span> từ vựng)</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
         </div>
-    }
+    </div>
 </div>
 
 <script>
+    // Hàm mở Modal Popup thêm từ vựng và truyền tên chủ đề tương ứng
+    function openCreateModal(topicName) {
+        document.getElementById('targetTopicBadge').innerText = topicName;
+        var myModal = new bootstrap.Modal(document.getElementById('createWordModal'));
+        myModal.show();
+    }
+
+    // Hàm tạo chủ đề mới từ giao diện Popup xinh xắn
+    function submitNewTopic() {
+        const input = document.getElementById('newTopicNameInput');
+        const topicName = input.value.trim();
+        
+        if (!topicName || topicName === "") {
+            alert("Vui lòng nhập tên chủ đề!");
+            return;
+        }
+        
+        const cleanName = topicName;
+        const wrapper = document.getElementById('topicsWrapper');
+        
+        if(wrapper.querySelector('.border-dashed')) {
+            wrapper.innerHTML = '';
+        }
+
+        if(document.getElementById(`topic-section-${cleanName}`)) {
+            alert("Chủ đề này đã tồn tại rồi!");
+            return;
+        }
+
+        const newSection = document.createElement('div');
+        newSection.className = 'topic-container';
+        newSection.id = `topic-section-${cleanName}`;
+        newSection.innerHTML = `
+            <div class="topic-header">
+                <h3 class="topic-title"><i class="ti ti-folder"></i> <span class="topic-name-text">${cleanName}</span></h3>
+                <div class="topic-actions">
+                    <button type="button" class="btn-add-word-inline" onclick="openCreateModal('${cleanName}')">
+                        <i class="ti ti-plus"></i> Thêm từ vào đây
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table theme-table align-middle">
+                    <thead>
+                        <tr>
+                            <th class="ps-4" style="width: 25%">Từ vựng</th>
+                            <th style="width: 25%">Nghĩa</th>
+                            <th style="width: 15%">Từ loại</th>
+                            <th style="width: 25%">Ví dụ</th>
+                            <th class="text-end pe-4" style="width: 10%">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody class="vocab-tbody">
+                        <tr class="empty-row-hint"><td colspan="5" class="text-center text-muted py-4 font-italic">Chủ đề này chưa có từ vựng. Bấm nút phía trên để thêm!</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+        wrapper.appendChild(newSection);
+
+        // Đóng popup
+        const modalEl = document.getElementById('createTopicModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+    }
+
+    // Nhấn phím Enter tại ô tạo chủ đề để submit nhanh
+    document.getElementById('newTopicNameInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') submitNewTopic();
+    });
+
+    // --- HÀM LỌC TÌM KIẾM ---
     function filterVocabulary() {
         const input = document.getElementById("vocabSearch");
         const filter = input.value.toLowerCase();
-        const table = document.getElementById("vocabTable");
-        if (!table) return;
-        
-        const rows = table.getElementsByClassName("vocab-row");
+        const rows = document.getElementsByClassName("vocab-row");
 
         for (let i = 0; i < rows.length; i++) {
-            // Quét dữ liệu ở cột Từ vựng (ô đầu tiên) và cột Định nghĩa (ô thứ hai)
             const termCell = rows[i].getElementsByClassName("term-text")[0];
             const defCell = rows[i].getElementsByClassName("definition-text")[0];
             
@@ -340,5 +574,90 @@
                 }
             }
         }
+    }
+
+    // --- CHUYỂN TAB TRONG POPUP TỪ VỰNG ---
+    function switchTab(formId, buttonElement) {
+        document.querySelectorAll('.form-section-box').forEach(el => el.classList.add('d-none'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(formId).classList.remove('d-none');
+        buttonElement.classList.add('active');
+    }
+
+    // --- PHÂN TÍCH NHẬP NHANH ---
+    function parseQuickInput() {
+        const inputString = document.getElementById('autoTerm').value.trim();
+        if (!inputString.includes('|')) return alert('Vui lòng dùng dấu "|" để phân tách các trường');
+        
+        const parts = inputString.split('|').map(item => item.trim());
+        document.getElementById('resultTerm').value = parts[0] || '';
+        document.getElementById('resultPronunciation').value = parts[1] || '';
+        document.getElementById('resultDefinition').value = parts[2] || '';
+        document.getElementById('resultCategory').value = parts[3] || '';
+        document.getElementById('resultExample').value = parts[4] || '';
+
+        let levelValue = "2";
+        if (parts[5]) {
+            const l = parts[5].toLowerCase();
+            if (l.includes("dễ")) levelValue = "1";
+            else if (l.includes("khó")) levelValue = "3";
+        }
+        document.getElementById('resultDifficultyLevel').value = levelValue;
+        document.getElementById('autoResult').classList.remove('d-none');
+    }
+
+    // --- PHÂN TÍCH NHẬP BULK ---
+    function parseMultiInput() {
+        const text = document.getElementById('multiTerm').value.trim();
+        if (!text) return alert('Hãy nhập dữ liệu.');
+
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        const tbody = document.getElementById('multiTableBody');
+        const hiddenContainer = document.getElementById('hiddenInputsContainer');
+        
+        tbody.innerHTML = '';
+        hiddenContainer.innerHTML = '';
+        let validCount = 0;
+
+        lines.forEach((line) => {
+            const parts = line.split('|').map(item => item.trim());
+            if (parts.length >= 1 && parts[0] !== '') {
+                const term = parts[0];
+                const pronunciation = parts[1] || '';
+                const definition = parts[2] || '';
+                const category = parts[3] || '';
+                const example = parts[4] || '';
+                
+                let levelValue = 2;
+                let levelBadge = '<span class="badge bg-warning">Trung Bình</span>';
+                if (parts[5]) {
+                    const l = parts[5].toLowerCase();
+                    if (l.includes("dễ")) { levelValue = 1; levelBadge = '<span class="badge bg-success">Dễ</span>'; }
+                    else if (l.includes("khó")) { levelValue = 3; levelBadge = '<span class="badge bg-danger">Khó</span>'; }
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="text-start"><b>${term}</b><br><small class="text-muted">${pronunciation}</small></td>
+                        <td>${definition}</td>
+                        <td><span class="badge bg-light text-dark border">${category}</span></td>
+                        <td>${levelBadge}</td>
+                    </tr>
+                `;
+
+                hiddenContainer.innerHTML += `
+                    <input type="hidden" name="words[${validCount}].Term" value="${term}">
+                    <input type="hidden" name="words[${validCount}].Pronunciation" value="${pronunciation}">
+                    <input type="hidden" name="words[${validCount}].Definition" value="${definition}">
+                    <input type="hidden" name="words[${validCount}].Category" value="${category}">
+                    <input type="hidden" name="words[${validCount}].Example" value="${example}">
+                    <input type="hidden" name="words[${validCount}].DifficultyLevel" value="${levelValue}">
+                `;
+                validCount++;
+            }
+        });
+
+        document.getElementById('wordCount').innerText = validCount;
+        document.getElementById('multiResult').classList.remove('d-none');
     }
 </script>
