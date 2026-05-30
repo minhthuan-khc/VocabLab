@@ -1,0 +1,61 @@
+@model VocabLab.ViewModels.SettingsViewModel
+@{
+    ViewData["Title"] = "Cài đặt";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            
+            <h2 class="mb-4 text-dark-emphasis">⚙️ Cài đặt tài khoản</h2>
+
+            @if (!string.IsNullOrEmpty(Model.StatusMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @Model.StatusMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white text-dark">
+                <form asp-action="Index" method="post">
+                    
+                    <h5 class="text-muted mb-3">Thông tin cá nhân</h5>
+                    <div class="mb-4">
+                        <label asp-for="FullName" class="form-label fw-bold text-secondary">Họ và tên hiển thị</label>
+                        <input asp-for="FullName" class="form-control form-control-lg rounded-3 border-secondary-subtle text-dark bg-light" placeholder="Nhập tên của bạn..." />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <hr class="my-4 text-muted" />
+
+                    <h5 class="text-muted mb-3">Tùy chọn ứng dụng</h5>
+                    
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" asp-for="EnableReminder" id="reminderSwitch" data-bs-toggle="collapse" data-bs-target="#reminderTimeArea">
+                        <label class="form-check-label fw-bold text-secondary" for="reminderSwitch">Nhắc nhở học tập hàng ngày</label>
+                    </div>
+
+                    <div class="collapse @(Model.EnableReminder ? "show" : "") mb-4" id="reminderTimeArea">
+                        <div class="card card-body bg-light border-0 rounded-3 p-3">
+                            <label asp-for="ReminderTime" class="form-label fw-bold text-secondary">Chọn thời gian nhắc nhở:</label>
+                            <input asp-for="ReminderTime" type="time" class="form-control w-50 border-secondary-subtle text-dark bg-white" />
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5" style="background-color: #7c4dff; border: none;">
+                            Lưu cấu hình
+                        </button>
+                    </div>
+                    
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

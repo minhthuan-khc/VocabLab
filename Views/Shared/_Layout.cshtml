@@ -273,7 +273,8 @@
            asp-controller="Leaderboard" asp-action="Index">
             <i class="ti ti-trophy"></i> Xếp hạng
         </a>
-        <a class="nav-item-side" href="#">
+        <a class="nav-item-side @(ViewContext.RouteData.Values["controller"]?.ToString() == "Settings" ? "active" : "")"
+           asp-controller="Settings" asp-action="Index">
             <i class="ti ti-settings"></i> Cài đặt
         </a>
 
