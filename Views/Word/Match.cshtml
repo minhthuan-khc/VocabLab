@@ -1,14 +1,172 @@
 @{ ViewData["Title"] = "Trò chơi nối từ"; }
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
 <style>
-    .match-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 800px; margin: 3rem auto; }
-    .match-item { background: var(--bg-card); border: 2px solid var(--border-color); color: var(--text-main); padding: 20px; text-align: center; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .match-item.selected { border-color: #3b82f6; background: var(--bg-select); }
-    .match-item.matched { visibility: hidden; pointer-events: none; }
+    /* Hệ thống biến màu sắc đồng bộ hoàn toàn với Flashcard */
+    :root {
+        --bg-app: #f8fafc;          
+        --bg-card-eng: #5bc0be;    /* Màu xanh luyentu đặc trưng cho từ tiếng Anh */
+        --bg-card-vie: #ffffff;    /* Nền trắng cho nghĩa tiếng Việt */
+        --text-main: #1e293b;       
+        --text-card-vie: #0f172a;  
+        --bg-topbar: rgba(0, 0, 0, 0.05);
+        --text-topbar: #334155;
+        --border-color: #cbd5e1;
+    }
+
+    [data-theme="dark"] {
+        --bg-app: #0f172a;          
+        --bg-card-eng: #3a8e8d;    /* Xanh tối dịu mắt */
+        --bg-card-vie: #1e293b;    /* Nền tối cho nghĩa tiếng Việt */
+        --text-main: #f8fafc;       
+        --text-card-vie: #f1f5f9;  
+        --bg-topbar: rgba(255, 255, 255, 0.1);
+        --text-topbar: #cbd5e1;
+        --border-color: #334155;
+    }
+
+    /* Giao diện Wrapper bao quanh */
+    .game-wrapper {
+        background-color: var(--bg-app);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Top Bar giống Flashcard */
+    .top-bar {
+        background: var(--bg-topbar);
+        border: 1px solid rgba(128, 128, 128, 0.2);
+        border-radius: 50px;
+        padding: 8px 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 2rem;
+        font-size: 14px;
+        width: 100%;
+        max-width: 550px;
+        justify-content: space-between;
+        color: var(--text-topbar);
+    }
+    .game-mode {
+        background: #f59e0b;
+        color: black;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 12px;
+    }
+    .top-bar a {
+        color: inherit;
+        text-decoration: none;
+    }
+    .top-bar a:hover { opacity: 0.8; }
+
+    /* Match Grid Container */
+    .match-grid { 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 16px; 
+        width: 100%;
+        max-width: 850px; 
+        margin: 1.5rem auto; 
+    }
+
+    /* Định dạng từng thẻ Match Item */
+    .match-item { 
+        min-height: 90px;
+        padding: 15px 20px; /* Khoảng cách lề thuận mắt */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center; 
+        border-radius: 16px; 
+        font-weight: 700; 
+        cursor: pointer; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s, opacity 0.4s;
+        user-select: none;
+        border: 2px solid transparent;
+        line-height: 1.2;
+    }
+
+    /* Phân loại màu sắc thẻ theo nhóm ngôn ngữ */
+    .match-item.type-eng {
+        background-color: var(--bg-card-eng);
+        color: #ffffff;
+    }
+    .match-item.type-vie {
+        background-color: var(--bg-card-vie);
+        color: var(--text-card-vie);
+        border-color: var(--border-color);
+    }
+
+    /* Hiệu ứng Hover nhẹ */
+    .match-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    /* Trạng thái được chọn (Selected) */
+    .match-item.selected { 
+        border-color: #f59e0b !important; /* Viền cam nổi bật */
+        transform: scale(1.03);
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+
+    /* Trạng thái Ghép đúng (Matched) -> Thu nhỏ ẩn đi mượt mà */
+    .match-item.matched { 
+        transform: scale(0);
+        opacity: 0;
+        pointer-events: none; 
+    }
+
+    /* Hiệu ứng lắc khi chọn sai cặp */
+    .match-item.wrong {
+        animation: shake 0.3s ease-in-out;
+        border-color: #ef4444 !important; /* Viền đỏ báo sai */
+    }
+
+    /* Cỡ chữ linh động được tính bằng JS để cố gắng giữ chữ nằm trên 1 hàng */
+    .font-single { font-size: 1.15rem; }
+    .font-multi  { font-size: 0.95rem; }
+
+    @@keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        75% { transform: translateX(6px); }
+    }
+
+    /* Giao diện Responsive trên điện thoại (chuyển sang 2 hoặc 3 cột nếu màn hình nhỏ) */
+    @@media (max-width: 600px) {
+        .match-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .match-item { min-height: 75px; padding: 10px; }
+    }
 </style>
 
-<div class="container text-center mt-4">
-    <h3>Ghép đôi từ vựng với ý nghĩa chính xác</h3>
-    <div class="match-grid" id="match-grid"></div>
+<div class="game-wrapper">
+    <div class="top-bar">
+        <div>
+            <span class="game-mode">MATCH</span> 
+            <span style="margin-left: 5px; font-weight: bold;">Nối Cặp Từ</span>
+        </div>
+        <div>
+            <a href="javascript:void(0)" onclick="loadMatchGame()"><i class="bi bi-arrow-clockwise"></i> Chơi lại</a>
+            <a href="/Word/Quiz"><i class="bi bi-box-arrow-right"></i> Thoát</a>
+        </div>
+    </div>
+
+    <div class="container text-center">
+        <p style="opacity: 0.8; font-size: 15px; font-weight: 500;">Ghép đôi các thẻ Từ tiếng Anh và Nghĩa tiếng Việt tương ứng</p>
+        
+        <div class="match-grid" id="match-grid"></div>
+    </div>
 </div>
 
 <script>
@@ -16,30 +174,71 @@
     let pairsCount = 0;
 
     async function loadMatchGame() {
-        const res = await fetch('/Word/GetWordsForGame?count=6'); // Lấy 6 từ tạo thành 12 thẻ
-        const words = await res.json();
-        pairsCount = words.length;
+        const grid = document.getElementById("match-grid");
+        grid.innerHTML = ""; // Xóa sạch bảng cũ khi reset hoặc tải mới
+        selectedItem = null;
 
+        try {
+            const res = await fetch('/Word/GetWordsForGame?count=6'); 
+            let words = await res.json();
+            
+            if(!words || words.length === 0) {
+                words = getMockData(); // Data dự phòng
+            }
+            initGrid(words);
+        } catch (e) {
+            initGrid(getMockData());
+        }
+    }
+
+    function getMockData() {
+        return [
+            { id: 1, english: "branch", vietnamese: "chi nhánh" },
+            { id: 2, english: "subsidiary", vietnamese: "công ty con" },
+            { id: 3, english: "headquarters", vietnamese: "trụ sở chính" },
+            { id: 4, english: "revenue", vietnamese: "doanh thu" },
+            { id: 5, english: "acquire", vietnamese: "thu mua, thâu tóm" },
+            { id: 6, english: "merge", vietnamese: "sáp nhập" }
+        ];
+    }
+
+    function initGrid(words) {
+        pairsCount = words.length;
         let items = [];
+        
         words.forEach(w => {
             items.push({ id: w.id, text: w.english, type: 'eng' });
             items.push({ id: w.id, text: w.vietnamese, type: 'vie' });
         });
+        
+        // Trộn ngẫu nhiên các thẻ
         items.sort(() => 0.5 - Math.random());
 
         const grid = document.getElementById("match-grid");
         items.forEach(data => {
             const block = document.createElement("div");
-            block.className = "match-item";
+            block.className = `match-item type-${data.type}`;
             block.innerText = data.text;
             block.dataset.id = data.id;
             block.dataset.type = data.type;
+            
+            // Tính toán số từ linh động để ép cỡ chữ hợp lý như Flashcard
+            const wordCount = data.text.trim().split(/\s+/).length;
+            if (wordCount >= 2 || data.text.length > 12) {
+                block.classList.add("font-multi");
+            } else {
+                block.classList.add("font-single");
+            }
+
             block.onclick = () => handleSelect(block);
             grid.appendChild(block);
         });
     }
 
     function handleSelect(block) {
+        // Tránh click lại vào thẻ đã biến mất hoặc thẻ đang báo lỗi sai
+        if(block.classList.contains("matched") || block.classList.contains("wrong")) return;
+
         if(!selectedItem) {
             selectedItem = block;
             block.classList.add("selected");
@@ -50,20 +249,40 @@
                 return;
             }
 
+            // Kiểm tra trùng ID (Khớp cặp) và phải khác Loại ngôn ngữ (1 eng - 1 vie)
             if(selectedItem.dataset.id === block.dataset.id && selectedItem.dataset.type !== block.dataset.type) {
-                // Khớp cặp chính xác
-                selectedItem.classList.add("matched");
+                const firstItem = selectedItem;
+                firstItem.classList.remove("selected");
+                
+                // Kích hoạt hiệu ứng biến mất scale(0) đồng thời
+                firstItem.classList.add("matched");
                 block.classList.add("matched");
+                
                 pairsCount--;
                 if(pairsCount === 0) {
-                    alert("Xuất sắc! Bạn đã dọn sạch bảng.");
-                    location.reload();
+                    setTimeout(() => {
+                        alert("Xuất sắc! Bạn đã dọn sạch bảng.");
+                        loadMatchGame(); // Tự động load màn mới
+                    }, 400);
                 }
+                selectedItem = null;
             } else {
-                // Sai cặp, reset hiệu ứng chọn
-                selectedItem.classList.remove("selected");
+                // Sai cặp: Lưu lại biến tạm để chạy hiệu ứng cảnh báo
+                const firstItem = selectedItem;
+                const secondItem = block;
+
+                firstItem.classList.remove("selected");
+                firstItem.classList.add("wrong");
+                secondItem.classList.add("wrong");
+
+                selectedItem = null;
+
+                // Gỡ bỏ class lỗi sau 300ms để người chơi tiếp tục bấm cặp khác
+                setTimeout(() => {
+                    firstItem.classList.remove("wrong");
+                    secondItem.classList.remove("wrong");
+                }, 300);
             }
-            selectedItem = null;
         }
     }
 

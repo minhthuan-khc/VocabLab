@@ -1,78 +1,405 @@
-@{ ViewData["Title"] = "Trắc nghiệm từ vựng"; }
+@{
+    ViewData["Title"] = "Trắc nghiệm từ vựng";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
 <style>
-    .quiz-container { max-width: 600px; margin: 3rem auto; background: var(--bg-card); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); }
-    .option-btn { width: 100%; text-align: left; padding: 14px 20px; margin-bottom: 12px; border-radius: 10px; border: 1px solid var(--border-select); background: var(--bg-select); color: var(--text-main); font-weight: 500; cursor: pointer; transition: all 0.2s; }
-    .option-btn:hover { border-color: #3b82f6; }
-    .correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
-    .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+    :root {
+        --bg-app: #f8fafc;
+        --bg-card: #ffffff;
+        --text-main: #1e293b;
+        --text-card: #0f172a;
+        --text-muted: #64748b;
+        --bg-topbar: rgba(0, 0, 0, 0.8);
+        --text-topbar: #ffffff;
+        --bg-btn-option: #f1f5f9;
+        --border-btn-option: #cbd5e1;
+        --text-btn-option: #334155;
+        --border-card: rgba(128, 128, 128, 0.2);
+    }
+
+    [data-theme="dark"] {
+        --bg-app: #0f172a;
+        --bg-card: #1e293b;
+        --text-main: #f8fafc;
+        --text-card: #ffffff;
+        --text-muted: #94a3b8;
+        --bg-topbar: rgba(0, 0, 0, 0.5);
+        --text-topbar: #cbd5e1;
+        --bg-btn-option: rgba(255, 255, 255, 0.05);
+        --border-btn-option: rgba(255, 255, 255, 0.1);
+        --text-btn-option: #cbd5e1;
+        --border-card: transparent;
+    }
+
+    .game-wrapper {
+        background-color: var(--bg-app);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .top-bar-container {
+        width: 100%;
+        max-width: 550px;
+        background: var(--bg-topbar);
+        border-radius: 24px;
+        padding: 15px 24px;
+        color: var(--text-topbar);
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .top-bar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .toggle-switch-mode {
+        background: rgba(255,255,255,0.2);
+        padding: 2px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .top-bar-row a {
+        color: inherit;
+        text-decoration: none;
+        opacity: 0.8;
+    }
+
+    .top-bar-row a:hover { opacity: 1; }
+
+    .progress-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+    }
+
+    .game-badge {
+        background: #f59e0b;
+        color: black;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    .progress-bar-bg {
+        flex: 1;
+        background: rgba(255,255,255,0.15);
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        background: #22c55e;
+        width: 0%;
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .quiz-card {
+        width: 100%;
+        max-width: 550px;
+        background-color: var(--bg-card);
+        color: var(--text-card);
+        border: 1px solid var(--border-card);
+        border-radius: 32px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .question-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        line-height: 1.3;
+    }
+
+    .options-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .option-btn {
+        width: 100%;
+        text-align: left;
+        padding: 14px 20px;
+        border-radius: 16px;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: var(--bg-btn-option);
+        border: 2px solid var(--border-btn-option);
+        color: var(--text-btn-option);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+
+    .option-btn:hover:not(:disabled) {
+        border-color: #3b82f6;
+        transform: translateY(-1px);
+    }
+
+    .option-btn.correct {
+        background-color: rgba(34, 197, 94, 0.15) !important;
+        border-color: #22c55e !important;
+        color: #16a34a !important;
+    }
+
+    .option-btn.wrong {
+        background-color: rgba(239, 68, 68, 0.15) !important;
+        border-color: #ef4444 !important;
+        color: #dc2626 !important;
+    }
+
+    .result-bar {
+        width: 100%;
+        border-radius: 16px;
+        padding: 14px 18px;
+        display: none;
+        text-align: left;
+        animation: slideDown 0.2s ease-out;
+    }
+
+    .result-bar.success {
+        background-color: rgba(34, 197, 94, 0.12);
+        border: 1px solid #22c55e;
+        color: #16a34a;
+    }
+
+    .result-bar.danger {
+        background-color: rgba(239, 68, 68, 0.12);
+        border: 1px solid #ef4444;
+        color: #dc2626;
+    }
+
+    .result-status-title {
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .difficulty-badge {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: bold;
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+    }
+
+    .result-info-text {
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: var(--text-card);
+    }
+
+    .result-info-text .example-block {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px dashed rgba(128, 128, 128, 0.2);
+        font-style: italic;
+        color: var(--text-muted);
+    }
+
+    @@keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
-<div class="quiz-container">
-    <div class="d-flex justify-content-between mb-3">
-        <span id="progress" style="color: var(--text-label)">Câu hỏi 1/10</span>
-        <span id="score" style="color: #16a34a; font-weight: 700">Điểm: 0</span>
+<div class="game-wrapper">
+    <div class="top-bar-container">
+        <div class="top-bar-row">
+            <div id="progress" style="font-weight: bold;">Câu hỏi 1 / 10</div>
+            <div class="toggle-switch-mode" id="score">Điểm: 0</div>
+            <div>
+                <a href="javascript:void(0)" onclick="restartGame(); return false;" style="margin-right: 15px;">
+                    <i class="bi bi-arrow-clockwise"></i> Chơi lại
+                </a>
+                <a href="/Word/Quiz"><i class="bi bi-box-arrow-right"></i> Thoát</a>
+            </div>
+        </div>
+        <div class="progress-wrapper">
+            <span class="game-badge">QUIZ</span>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
     </div>
-    <h2 id="question-text" class="mb-4" style="color: var(--text-main)">...</h2>
-    <div id="options-group"></div>
+
+    <div class="quiz-card">
+        <h2 id="question-text" class="question-title">Nghĩa của từ "..." là gì?</h2>
+        <div class="options-list" id="options-group"></div>
+        <div class="result-bar" id="result-bar">
+            <div class="result-status-title">
+                <span id="result-title"></span>
+                <span class="difficulty-badge" id="word-difficulty">Độ khó: Trung bình</span>
+            </div>
+            <div class="result-info-text" id="result-info"></div>
+        </div>
+    </div>
 </div>
 
 <script>
-    let words = [];
-    let currentIndex = 0;
-    let score = 0;
+    (function () {
+        let words = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isWaiting = false;
 
-    async function loadQuiz() {
-        const res = await fetch('/Word/GetWordsForGame?count=10');
-        words = await res.json();
-        generateQuestion();
-    }
-
-    function generateQuestion() {
-        if(currentIndex >= words.length) {
-            alert(`Chúc mừng! Bạn hoàn thành bài test với số điểm: ${score}`);
-            fetch(`/Word/SaveHistory?gameName=Trắc nghiệm&score=${score}`, {method: 'POST'});
-            return;
-        }
-        
-        document.getElementById("progress").innerText = `Câu hỏi ${currentIndex + 1}/${words.length}`;
-        const currentWord = words[currentIndex];
-        document.getElementById("question-text").innerText = `Nghĩa của từ "${currentWord.english}" là gì?`;
-
-        // Trộn đáp án bốc ngẫu nhiên từ các từ khác làm mồi nhử
-        let options = [currentWord.vietnamese];
-        let wrongWords = words.filter(w => w.id !== currentWord.id).map(w => w.vietnamese);
-        wrongWords = wrongWords.sort(() => 0.5 - Math.random()).slice(0, 3);
-        options = [...options, ...wrongWords].sort(() => 0.5 - Math.random());
-
-        const group = document.getElementById("options-group");
-        group.innerHTML = "";
-        options.forEach(opt => {
-            const btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(btn, opt, currentWord.vietnamese);
-            group.appendChild(btn);
-        });
-    }
-
-    function checkAnswer(btn, selected, correct) {
-        const buttons = document.querySelectorAll(".option-btn");
-        buttons.forEach(b => b.disabled = true); // Khóa click bừa
-
-        if(selected === correct) {
-            btn.classList.add("correct");
-            score += 10;
-            document.getElementById("score").innerText = `Điểm: ${score}`;
-        } else {
-            btn.classList.add("wrong");
-            buttons.forEach(b => { if(b.innerText === correct) b.classList.add("correct"); });
-        }
-
-        setTimeout(() => {
-            currentIndex++;
+        async function loadQuiz() {
+            try {
+                const res = await fetch('/Word/GetWordsForGame?count=10');
+                const data = await res.json();
+                words = (data && data.length > 0) ? data : getMockData();
+            } catch (e) {
+                words = getMockData();
+            }
+            currentIndex = 0;
+            score = 0;
+            document.getElementById('score').innerText = 'Điểm: 0';
             generateQuestion();
-        }, 1500);
-    }
+        }
 
-    document.addEventListener("DOMContentLoaded", loadQuiz);
+        function getMockData() {
+            return [
+                { english: "state",      vietnamese: "tuyên bố; trạng thái", difficulty: "Cơ bản",    example: 'Ví dụ: "The system is in a stable state."' },
+                { english: "branch",     vietnamese: "chi nhánh công ty",    difficulty: "Cơ bản",    example: 'Ví dụ: "Our company opened a new branch in Hanoi."' },
+                { english: "subsidiary", vietnamese: "công ty con",           difficulty: "Trung bình", example: 'Ví dụ: "A subsidiary company."' },
+                { english: "revenue",    vietnamese: "doanh thu",             difficulty: "Khó",       example: 'Ví dụ: "The company reported a drop in revenue."' }
+            ];
+        }
+
+        function generateQuestion() {
+            isWaiting = false;
+
+            if (currentIndex >= words.length) {
+                alert('Chúc mừng! Bạn hoàn thành bài test với số điểm: ' + score);
+                fetch('/Word/SaveGameHistory?gameName=Trắc nghiệm&score=' + score);
+                loadQuiz();
+                return;
+            }
+
+            document.getElementById('result-bar').style.display = 'none';
+            document.getElementById('progress').innerText = 'Câu hỏi ' + (currentIndex + 1) + ' / ' + words.length;
+            document.getElementById('progress-fill').style.width = (((currentIndex + 1) / words.length) * 100) + '%';
+
+            const cur = words[currentIndex];
+            const engWord   = cur.english    || cur.English;
+            const vieAnswer = cur.vietnamese || cur.Vietnamese;
+
+            document.getElementById('question-text').innerText = 'Nghĩa của từ "' + engWord + '" là gì?';
+
+            let distractors = words
+                .filter(w => (w.english || w.English) !== engWord)
+                .map(w => w.vietnamese || w.Vietnamese);
+
+            distractors = [...new Set(distractors)].sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            let options = [vieAnswer, ...distractors];
+            while (options.length < 4) {
+                options.push('Phương án lựa chọn nhiễu ' + options.length);
+            }
+            options.sort(() => 0.5 - Math.random());
+
+            const group = document.getElementById('options-group');
+            group.innerHTML = '';
+
+            options.forEach(function (opt) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+
+                // FIX: addEventListener + preventDefault + stopPropagation
+                // ngăn click bubble lên form cha của layout gây reload trang
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    checkAnswer(btn, opt, vieAnswer);
+                });
+
+                group.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btn, selected, correct) {
+            if (isWaiting) return;
+            isWaiting = true;
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(function (b) { b.disabled = true; });
+
+            const resultBar   = document.getElementById('result-bar');
+            const resultTitle = document.getElementById('result-title');
+            const resultInfo  = document.getElementById('result-info');
+            const diffBadge   = document.getElementById('word-difficulty');
+
+            resultBar.classList.remove('success', 'danger');
+
+            const cur      = words[currentIndex];
+            const engWord  = cur.english    || cur.English;
+            const vieWord  = cur.vietnamese || cur.Vietnamese;
+            const exWord   = cur.example    || cur.Example    || 'Chưa có câu ví dụ cho từ này.';
+            const diffWord = cur.difficulty || cur.Difficulty || 'Trung bình';
+
+            diffBadge.innerText = 'Độ khó: ' + diffWord;
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 10;
+                document.getElementById('score').innerText = 'Điểm: ' + score;
+                resultBar.classList.add('success');
+                resultTitle.innerHTML = '<i class="bi bi-check-circle-fill"></i> Đáp án chính xác!';
+            } else {
+                btn.classList.add('wrong');
+                buttons.forEach(function (b) {
+                    if (b.innerText === correct) b.classList.add('correct');
+                });
+                resultBar.classList.add('danger');
+                resultTitle.innerHTML = '<i class="bi bi-x-circle-fill"></i> Lựa chọn chưa chính xác!';
+            }
+
+            resultInfo.innerHTML =
+                '<div><strong>' + engWord + '</strong>: ' + vieWord + '</div>' +
+                '<div class="example-block">' + exWord + '</div>';
+
+            resultBar.style.display = 'block';
+
+            setTimeout(function () {
+                currentIndex++;
+                generateQuestion();
+            }, 2500);
+        }
+
+        // Export ra window để nút "Chơi lại" trong HTML gọi được
+        window.restartGame = function () { loadQuiz(); };
+
+        document.addEventListener('DOMContentLoaded', loadQuiz);
+    })();
 </script>
