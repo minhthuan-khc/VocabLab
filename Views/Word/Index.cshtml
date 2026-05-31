@@ -455,6 +455,7 @@
                 <div id="multiForm" class="form-section-box d-none">
                     <div class="mb-3">
                         <label class="custom-form-label">Nhập danh sách từ vựng (Mỗi từ 1 dòng) *</label>
+                        <small class="form-text text-muted">Cấu trúc: Từ | /phiên âm/ | định nghĩa | Từ loại | Ví dụ | Độ khó</small>
                         <textarea class="custom-form-input pt-2 font-monospace" id="multiTerm" rows="5" placeholder="laptop | /ˈlæp.tɒp/ | máy tính xách tay | Noun | My new laptop | Dễ"></textarea>
                     </div>
                     <button type="button" class="process-btn mb-3" onclick="parseMultiInput()"><i class="ti ti-cpu"></i> Trích xuất dữ liệu</button>
@@ -638,8 +639,8 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td class="text-start"><b>${term}</b><br><small class="text-muted">${pronunciation}</small></td>
-                        <td>${definition}</td>
+                        <td class="text-start"><span class="term-text"><b>${term}</b><br><small class="text-muted">${pronunciation}</small></span></td>
+                        <td><span class="definition-text">${definition}</span></td>
                         <td><span class="badge bg-light text-dark border">${category}</span></td>
                         <td>${levelBadge}</td>
                     </tr>
